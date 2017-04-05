@@ -1,0 +1,2625 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Infographic Builder</title>
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://static.kent.ac.uk/pantheon/static/webfonts/kentfont/css/kentfont.css">
+    <style type="text/css">
+		@font-face {
+		    font-family: 'CenturySchoolbookStdRegular';
+		    src: url('https://static.kent.ac.uk/pantheon/static/webfonts/censcbk-webfont.eot');
+		    src: local('Century Schoolbook'), local('CenturySchoolbook'),
+			url('https://static.kent.ac.uk/pantheon/static/webfonts/censcbk-webfont.woff') format('woff'),
+			url('https://static.kent.ac.uk/pantheon/static/webfonts/censcbk-webfont.ttf') format('truetype'),
+			url('https://static.kent.ac.uk/pantheon/static/webfonts/censcbk-webfont.svg#webfontTvZDraOm') format('svg');
+		    font-weight: normal;
+		    font-style: normal;
+		}
+
+    	svg.defs-only {
+    		display: block;
+		    position: absolute;
+		    height: 0;
+		    width: 0;
+		    margin: 0;
+		    padding: 0;
+		    border: none;
+		    overflow: hidden;
+    	}
+
+    	.workspace {
+    		width: 100%;
+    		height: calc(100vh - 100px);
+    		display: flex;
+			justify-content: center;
+			align-items: center;
+			background-color: #282828;
+    	}
+
+    	.build-area-container {
+    		position: relative;
+    		display: inline-block;
+    	}
+
+    	.svg-build-area {
+    		border: 1px solid #383838;
+    		display: inline-block;
+    		position: relative;
+    		z-index: 0;
+    		overflow: hidden;
+    	}
+    	.svg-build-area * {
+    		user-select: none;
+    	}
+    	.svg-build-area svg *:hover, .resizer {
+    		cursor: move;
+    	}
+    	.resizer::after {
+    		display: inline-block;
+		    font: normal normal normal 14px/1 FontAwesome;
+		    font-size: inherit;
+		    text-rendering: auto;
+		    -webkit-font-smoothing: antialiased;
+		    -moz-osx-font-smoothing: grayscale;
+    		content: "\f0b2";
+    		color: #383838;
+    		position: absolute;
+    		bottom: -20px;
+    		right: -20px;
+    	}
+    	.underlay, .overlay {
+    		position: absolute;
+    		top: 0;
+    		left: 0;
+    	}
+    	.underlay {
+    		z-index: -1;
+    	}
+    	.overlay {
+    		z-index: 1;
+    	}
+
+    	.control-panel {
+    		position: fixed;
+    		background: #535353;
+    		z-index: 10;
+    	}
+
+    	.sprite-container {
+    		left: 0;
+    		top: 0;
+    		bottom: 0;
+    		height: 100vh;
+    		width: 162px;
+    		overflow: scroll;
+    		padding: 0 3px;
+    		border-right: 1px solid #383838;
+    	}
+
+    	.toolbar-container {
+    		left: 169px;
+    		right: 0;
+    		top: 0;
+    		height: 100px;
+    		width: calc(100vw - 165px);
+    		padding: 3px;
+    		border-bottom: 1px solid #383838;
+    	}
+
+    	.sprite-box ul {
+    		list-style: none;
+    		padding: 0;
+    	}
+
+    	body {
+    		margin: 0;
+    		margin-left: 169px;
+    		margin-top: 100px;
+    	}
+    </style>
+  </head>
+  <body>
+	  <svg class="defs-only" xmlns="http://www.w3.org/2000/svg">
+	    <linearGradient id="coin" x2="50%" y2="40%" spreadMethod="reflect">
+	        <stop stop-color="gold" offset="30%"></stop>
+	        <stop stop-color="goldenrod" offset="70%"></stop>
+	        <stop stop-color="white" offset="82%"></stop>
+	        <stop stop-color="gold" offset="92%"></stop>
+	        <stop stop-color="darkgoldenrod" offset="100%"></stop>
+	    </linearGradient>
+	    <radialGradient id="pot" fx="30%" fy="35%">
+	        <stop stop-color="white" offset="0%"></stop>
+	        <stop stop-color="gold" offset="15%"></stop>
+	        <stop stop-color="goldenrod" offset="80%"></stop>
+	        <stop stop-color="darkgoldenrod" offset="100%"></stop>
+	    </radialGradient>
+	    <symbol id="potofgold">
+	        <g fill="url(#coin)" stroke="darkgoldenrod" stroke-width="0.5">
+	            <circle r="5" transform="translate(30,7)"></circle>
+	            <circle r="5" transform="translate(35,13)"></circle>
+	            <circle r="5" transform="translate(22,10)"></circle>
+	            <circle r="5" transform="translate(27,9)"></circle>
+	            <circle r="5" transform="translate(18,17)"></circle>
+	            <circle r="5" transform="translate(42,18)"></circle>
+	            <circle r="5" transform="translate(32,19)"></circle>
+	            <circle r="5" transform="translate(30,14)"></circle>
+	            <circle r="5" transform="translate(25,15)"></circle>
+	            <circle r="5" transform="translate(37,19)"></circle>
+	            <circle r="5" transform="translate(31,16)"></circle>
+	            <circle r="5" transform="translate(20,18)"></circle>
+	            <circle r="5" transform="translate(26,21)"></circle>
+	        </g>
+	        <path fill="url(#pot)" stroke="#751" stroke-width="0.5" d="M30,50 C45,50 55,45 55,35
+	                 Q 55,27 50,25 C55,22 53,15 45,20
+	                 S 23,25 15,20 S5,22 10,25
+	                 Q 5,27 5,35 C5,45 15,50 30,50Z"></path>
+	    </symbol>
+	    <symbol id="degreescroll">
+	    	<path fill="#fff" class="cls-1" d="M83.76,282c-2.62-15.25-11.93-31.7-15.5-35.5-5.62-6-27.25-25.5-45.5,1.5-3.37,4.63-9.83,76.5,58,88.5,14.83,1.5,9.5-1.5,35-16.5s297.5-185.5,399.5-199.5c0,0,8,.5,7,11-4.5,20-198,64-407.5,226.5-67.25,35.25-151-99-98-139.5s207.5-68.5,357-186c74.13-58.26,99.5-20.5,99.5-20.5s46,46.5,43,75.5-68.5,28-158.5,80.5C330.33,184,97.34,310.7,88.26,316c-8.17,3.75-49-5.5-48.5-49s33.63,17,34.5,19.5S86.38,297.28,83.76,282Z"/><path fill="#896825" class="cls-2" d="M250.26,266.25s76-7.22,137,44.28c0,0,17.5-47.5,16.5-53.5l71-16S428,211.12,363.51,206.12V206C329.13,222.46,291,242,250.29,266.13,250.1,266.43,250.26,266.25,250.26,266.25Z"/><path class="cls-3" d="M250.07,266.48l-.27.43Z"/><path fill="#937227" class="cls-3" d="M250.24,266.19c40.7-24.14,78.89-43.66,113.27-60.07h0l2.25-51.58s-5.91-54.75-72.41-66.75c0,0-113.53,58.22-120.76,60.58,0,0,65.67-1.83,80.17,45.67,13.43,44-.38,68.71-2.52,72.16Z"/>
+	    </symbol>
+	</svg>
+<div class="sprite-container control-panel">
+	<select id="collectionPicker">
+	</select>
+<div class="sprite-box" id="kentgraphics" data-name="Kent Infographic graphics" data-type="inline-svg">
+<ul>
+<li data-addable="true"><svg width="55" height="41" viewBox="0 0 559 419"><use xlink:href="#degreescroll"/></svg> Degree scroll</li>
+</ul>
+</div>
+<div class="sprite-box" id="fontawesome" data-name="Font Awesome icons" data-type="font" data-font="FontAwesome">
+    <section id="web-application">
+  <h2 class="page-header">Web Application Icons</h2>
+
+  <ul>
+
+
+
+      <li data-addable="true"><i class="fa fa-address-book" data-name="address-book" aria-hidden="true" data-code="f2b9"></i> address-book</li>
+
+      <li data-addable="true"><i class="fa fa-address-book-o" data-name="address-book-o" aria-hidden="true" data-code="f2ba"></i> address-book-o</li>
+
+      <li data-addable="true"><i class="fa fa-address-card" data-name="address-card" aria-hidden="true" data-code="f2bb"></i> address-card</li>
+
+      <li data-addable="true"><i class="fa fa-address-card-o" data-name="address-card-o" aria-hidden="true" data-code="f2bc"></i> address-card-o</li>
+
+      <li data-addable="true"><i class="fa fa-adjust" data-name="adjust" aria-hidden="true" data-code="f042"></i> adjust</li>
+
+      <li data-addable="true"><i class="fa fa-american-sign-language-interpreting" data-name="american-sign-language-interpreting" aria-hidden="true" data-code="f2a3"></i> american-sign-language-interpreting</li>
+
+      <li data-addable="true"><i class="fa fa-anchor" data-name="anchor" aria-hidden="true" data-code="f13d"></i> anchor</li>
+
+      <li data-addable="true"><i class="fa fa-archive" data-name="archive" aria-hidden="true" data-code="f187"></i> archive</li>
+
+      <li data-addable="true"><i class="fa fa-area-chart" data-name="area-chart" aria-hidden="true" data-code="f1fe"></i> area-chart</li>
+
+      <li data-addable="true"><i class="fa fa-arrows" data-name="arrows" aria-hidden="true" data-code="f047"></i> arrows</li>
+
+      <li data-addable="true"><i class="fa fa-arrows-h" data-name="arrows-h" aria-hidden="true" data-code="f07e"></i> arrows-h</li>
+
+      <li data-addable="true"><i class="fa fa-arrows-v" data-name="arrows-v" aria-hidden="true" data-code="f07d"></i> arrows-v</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-assistive-listening-systems" data-name="assistive-listening-systems" aria-hidden="true" data-code="f2a2"></i> assistive-listening-systems</li>
+
+      <li data-addable="true"><i class="fa fa-asterisk" data-name="asterisk" aria-hidden="true" data-code="f069"></i> asterisk</li>
+
+      <li data-addable="true"><i class="fa fa-at" data-name="at" aria-hidden="true" data-code="f1fa"></i> at</li>
+
+      <li data-addable="true"><i class="fa fa-audio-description" data-name="audio-description" aria-hidden="true" data-code="f29e"></i> audio-description</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-balance-scale" data-name="balance-scale" aria-hidden="true" data-code="f24e"></i> balance-scale</li>
+
+      <li data-addable="true"><i class="fa fa-ban" data-name="ban" aria-hidden="true" data-code="f05e"></i> ban</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-bar-chart" data-name="bar-chart" aria-hidden="true" data-code="f080"></i> bar-chart</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-barcode" data-name="barcode" aria-hidden="true" data-code="f02a"></i> barcode</li>
+
+      <li data-addable="true"><i class="fa fa-bars" data-name="bars" aria-hidden="true" data-code="f0c9"></i> bars</li>
+
+      <li data-addable="true"><i class="fa fa-bath" data-name="bath" aria-hidden="true" data-code="f2cd"></i> bath</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <li data-addable="true"><i class="fa fa-battery-empty" data-name="battery-empty" aria-hidden="true" data-code="f244"></i> battery-empty</li>
+
+      <li data-addable="true"><i class="fa fa-battery-full" data-name="battery-full" aria-hidden="true" data-code="f240"></i> battery-full</li>
+
+      <li data-addable="true"><i class="fa fa-battery-half" data-name="battery-half" aria-hidden="true" data-code="f242"></i> battery-half</li>
+
+      <li data-addable="true"><i class="fa fa-battery-quarter" data-name="battery-quarter" aria-hidden="true" data-code="f243"></i> battery-quarter</li>
+
+      <li data-addable="true"><i class="fa fa-battery-three-quarters" data-name="battery-three-quarters" aria-hidden="true" data-code="f241"></i> battery-three-quarters</li>
+
+      <li data-addable="true"><i class="fa fa-bed" data-name="bed" aria-hidden="true" data-code="f236"></i> bed</li>
+
+      <li data-addable="true"><i class="fa fa-beer" data-name="beer" aria-hidden="true" data-code="f0fc"></i> beer</li>
+
+      <li data-addable="true"><i class="fa fa-bell" data-name="bell" aria-hidden="true" data-code="f0f3"></i> bell</li>
+
+      <li data-addable="true"><i class="fa fa-bell-o" data-name="bell-o" aria-hidden="true" data-code="f0a2"></i> bell-o</li>
+
+      <li data-addable="true"><i class="fa fa-bell-slash" data-name="bell-slash" aria-hidden="true" data-code="f1f6"></i> bell-slash</li>
+
+      <li data-addable="true"><i class="fa fa-bell-slash-o" data-name="bell-slash-o" aria-hidden="true" data-code="f1f7"></i> bell-slash-o</li>
+
+      <li data-addable="true"><i class="fa fa-bicycle" data-name="bicycle" aria-hidden="true" data-code="f206"></i> bicycle</li>
+
+      <li data-addable="true"><i class="fa fa-binoculars" data-name="binoculars" aria-hidden="true" data-code="f1e5"></i> binoculars</li>
+
+      <li data-addable="true"><i class="fa fa-birthday-cake" data-name="birthday-cake" aria-hidden="true" data-code="f1fd"></i> birthday-cake</li>
+
+      <li data-addable="true"><i class="fa fa-blind" data-name="blind" aria-hidden="true" data-code="f29d"></i> blind</li>
+
+      <li data-addable="true"><i class="fa fa-bluetooth" data-name="bluetooth" aria-hidden="true" data-code="f293"></i> bluetooth</li>
+
+      <li data-addable="true"><i class="fa fa-bluetooth-b" data-name="bluetooth-b" aria-hidden="true" data-code="f294"></i> bluetooth-b</li>
+
+      <li data-addable="true"><i class="fa fa-bolt" data-name="bolt" aria-hidden="true" data-code="f0e7"></i> bolt</li>
+
+      <li data-addable="true"><i class="fa fa-bomb" data-name="bomb" aria-hidden="true" data-code="f1e2"></i> bomb</li>
+
+      <li data-addable="true"><i class="fa fa-book" data-name="book" aria-hidden="true" data-code="f02d"></i> book</li>
+
+      <li data-addable="true"><i class="fa fa-bookmark" data-name="bookmark" aria-hidden="true" data-code="f02e"></i> bookmark</li>
+
+      <li data-addable="true"><i class="fa fa-bookmark-o" data-name="bookmark-o" aria-hidden="true" data-code="f097"></i> bookmark-o</li>
+
+      <li data-addable="true"><i class="fa fa-braille" data-name="braille" aria-hidden="true" data-code="f2a1"></i> braille</li>
+
+      <li data-addable="true"><i class="fa fa-briefcase" data-name="briefcase" aria-hidden="true" data-code="f0b1"></i> briefcase</li>
+
+      <li data-addable="true"><i class="fa fa-bug" data-name="bug" aria-hidden="true" data-code="f188"></i> bug</li>
+
+      <li data-addable="true"><i class="fa fa-building" data-name="building" aria-hidden="true" data-code="f1ad"></i> building</li>
+
+      <li data-addable="true"><i class="fa fa-building-o" data-name="building-o" aria-hidden="true" data-code="f0f7"></i> building-o</li>
+
+      <li data-addable="true"><i class="fa fa-bullhorn" data-name="bullhorn" aria-hidden="true" data-code="f0a1"></i> bullhorn</li>
+
+      <li data-addable="true"><i class="fa fa-bullseye" data-name="bullseye" aria-hidden="true" data-code="f140"></i> bullseye</li>
+
+      <li data-addable="true"><i class="fa fa-bus" data-name="bus" aria-hidden="true" data-code="f207"></i> bus</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-calculator" data-name="calculator" aria-hidden="true" data-code="f1ec"></i> calculator</li>
+
+      <li data-addable="true"><i class="fa fa-calendar" data-name="calendar" aria-hidden="true" data-code="f073"></i> calendar</li>
+
+      <li data-addable="true"><i class="fa fa-calendar-check-o" data-name="calendar-check-o" aria-hidden="true" data-code="f274"></i> calendar-check-o</li>
+
+      <li data-addable="true"><i class="fa fa-calendar-minus-o" data-name="calendar-minus-o" aria-hidden="true" data-code="f272"></i> calendar-minus-o</li>
+
+      <li data-addable="true"><i class="fa fa-calendar-o" data-name="calendar-o" aria-hidden="true" data-code="f133"></i> calendar-o</li>
+
+      <li data-addable="true"><i class="fa fa-calendar-plus-o" data-name="calendar-plus-o" aria-hidden="true" data-code="f271"></i> calendar-plus-o</li>
+
+      <li data-addable="true"><i class="fa fa-calendar-times-o" data-name="calendar-times-o" aria-hidden="true" data-code="f273"></i> calendar-times-o</li>
+
+      <li data-addable="true"><i class="fa fa-camera" data-name="camera" aria-hidden="true" data-code="f030"></i> camera</li>
+
+      <li data-addable="true"><i class="fa fa-camera-retro" data-name="camera-retro" aria-hidden="true" data-code="f083"></i> camera-retro</li>
+
+      <li data-addable="true"><i class="fa fa-car" data-name="car" aria-hidden="true" data-code="f1b9"></i> car</li>
+
+      <li data-addable="true"><i class="fa fa-caret-square-o-down" data-name="caret-square-o-down" aria-hidden="true" data-code="f150"></i> caret-square-o-down</li>
+
+      <li data-addable="true"><i class="fa fa-caret-square-o-left" data-name="caret-square-o-left" aria-hidden="true" data-code="f191"></i> caret-square-o-left</li>
+
+      <li data-addable="true"><i class="fa fa-caret-square-o-right" data-name="caret-square-o-right" aria-hidden="true" data-code="f152"></i> caret-square-o-right</li>
+
+      <li data-addable="true"><i class="fa fa-caret-square-o-up" data-name="caret-square-o-up" aria-hidden="true" data-code="f151"></i> caret-square-o-up</li>
+
+      <li data-addable="true"><i class="fa fa-cart-arrow-down" data-name="cart-arrow-down" aria-hidden="true" data-code="f218"></i> cart-arrow-down</li>
+
+      <li data-addable="true"><i class="fa fa-cart-plus" data-name="cart-plus" aria-hidden="true" data-code="f217"></i> cart-plus</li>
+
+      <li data-addable="true"><i class="fa fa-cc" data-name="cc" aria-hidden="true" data-code="f20a"></i> cc</li>
+
+      <li data-addable="true"><i class="fa fa-certificate" data-name="certificate" aria-hidden="true" data-code="f0a3"></i> certificate</li>
+
+      <li data-addable="true"><i class="fa fa-check" data-name="check" aria-hidden="true" data-code="f00c"></i> check</li>
+
+      <li data-addable="true"><i class="fa fa-check-circle" data-name="check-circle" aria-hidden="true" data-code="f058"></i> check-circle</li>
+
+      <li data-addable="true"><i class="fa fa-check-circle-o" data-name="check-circle-o" aria-hidden="true" data-code="f05d"></i> check-circle-o</li>
+
+      <li data-addable="true"><i class="fa fa-check-square" data-name="check-square" aria-hidden="true" data-code="f14a"></i> check-square</li>
+
+      <li data-addable="true"><i class="fa fa-check-square-o" data-name="check-square-o" aria-hidden="true" data-code="f046"></i> check-square-o</li>
+
+      <li data-addable="true"><i class="fa fa-child" data-name="child" aria-hidden="true" data-code="f1ae"></i> child</li>
+
+      <li data-addable="true"><i class="fa fa-circle" data-name="circle" aria-hidden="true" data-code="f111"></i> circle</li>
+
+      <li data-addable="true"><i class="fa fa-circle-o" data-name="circle-o" aria-hidden="true" data-code="f10c"></i> circle-o</li>
+
+      <li data-addable="true"><i class="fa fa-circle-o-notch" data-name="circle-o-notch" aria-hidden="true" data-code="f1ce"></i> circle-o-notch</li>
+
+      <li data-addable="true"><i class="fa fa-circle-thin" data-name="circle-thin" aria-hidden="true" data-code="f1db"></i> circle-thin</li>
+
+      <li data-addable="true"><i class="fa fa-clock-o" data-name="clock-o" aria-hidden="true" data-code="f017"></i> clock-o</li>
+
+      <li data-addable="true"><i class="fa fa-clone" data-name="clone" aria-hidden="true" data-code="f24d"></i> clone</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-cloud" data-name="cloud" aria-hidden="true" data-code="f0c2"></i> cloud</li>
+
+      <li data-addable="true"><i class="fa fa-cloud-download" data-name="cloud-download" aria-hidden="true" data-code="f0ed"></i> cloud-download</li>
+
+      <li data-addable="true"><i class="fa fa-cloud-upload" data-name="cloud-upload" aria-hidden="true" data-code="f0ee"></i> cloud-upload</li>
+
+      <li data-addable="true"><i class="fa fa-code" data-name="code" aria-hidden="true" data-code="f121"></i> code</li>
+
+      <li data-addable="true"><i class="fa fa-code-fork" data-name="code-fork" aria-hidden="true" data-code="f126"></i> code-fork</li>
+
+      <li data-addable="true"><i class="fa fa-coffee" data-name="coffee" aria-hidden="true" data-code="f0f4"></i> coffee</li>
+
+      <li data-addable="true"><i class="fa fa-cog" data-name="cog" aria-hidden="true" data-code="f013"></i> cog</li>
+
+      <li data-addable="true"><i class="fa fa-cogs" data-name="cogs" aria-hidden="true" data-code="f085"></i> cogs</li>
+
+      <li data-addable="true"><i class="fa fa-comment" data-name="comment" aria-hidden="true" data-code="f075"></i> comment</li>
+
+      <li data-addable="true"><i class="fa fa-comment-o" data-name="comment-o" aria-hidden="true" data-code="f0e5"></i> comment-o</li>
+
+      <li data-addable="true"><i class="fa fa-commenting" data-name="commenting" aria-hidden="true" data-code="f27a"></i> commenting</li>
+
+      <li data-addable="true"><i class="fa fa-commenting-o" data-name="commenting-o" aria-hidden="true" data-code="f27b"></i> commenting-o</li>
+
+      <li data-addable="true"><i class="fa fa-comments" data-name="comments" aria-hidden="true" data-code="f086"></i> comments</li>
+
+      <li data-addable="true"><i class="fa fa-comments-o" data-name="comments-o" aria-hidden="true" data-code="f0e6"></i> comments-o</li>
+
+      <li data-addable="true"><i class="fa fa-compass" data-name="compass" aria-hidden="true" data-code="f14e"></i> compass</li>
+
+      <li data-addable="true"><i class="fa fa-copyright" data-name="copyright" aria-hidden="true" data-code="f1f9"></i> copyright</li>
+
+      <li data-addable="true"><i class="fa fa-creative-commons" data-name="creative-commons" aria-hidden="true" data-code="f25e"></i> creative-commons</li>
+
+      <li data-addable="true"><i class="fa fa-credit-card" data-name="credit-card" aria-hidden="true" data-code="f09d"></i> credit-card</li>
+
+      <li data-addable="true"><i class="fa fa-credit-card-alt" data-name="credit-card-alt" aria-hidden="true" data-code="f283"></i> credit-card-alt</li>
+
+      <li data-addable="true"><i class="fa fa-crop" data-name="crop" aria-hidden="true" data-code="f125"></i> crop</li>
+
+      <li data-addable="true"><i class="fa fa-crosshairs" data-name="crosshairs" aria-hidden="true" data-code="f05b"></i> crosshairs</li>
+
+      <li data-addable="true"><i class="fa fa-cube" data-name="cube" aria-hidden="true" data-code="f1b2"></i> cube</li>
+
+      <li data-addable="true"><i class="fa fa-cubes" data-name="cubes" aria-hidden="true" data-code="f1b3"></i> cubes</li>
+
+      <li data-addable="true"><i class="fa fa-cutlery" data-name="cutlery" aria-hidden="true" data-code="f0f5"></i> cutlery</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-database" data-name="database" aria-hidden="true" data-code="f1c0"></i> database</li>
+
+      <li data-addable="true"><i class="fa fa-deaf" data-name="deaf" aria-hidden="true" data-code="f2a4"></i> deaf</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-desktop" data-name="desktop" aria-hidden="true" data-code="f108"></i> desktop</li>
+
+      <li data-addable="true"><i class="fa fa-diamond" data-name="diamond" aria-hidden="true" data-code="f219"></i> diamond</li>
+
+      <li data-addable="true"><i class="fa fa-dot-circle-o" data-name="dot-circle-o" aria-hidden="true" data-code="f192"></i> dot-circle-o</li>
+
+      <li data-addable="true"><i class="fa fa-download" data-name="download" aria-hidden="true" data-code="f019"></i> download</li>
+
+
+
+
+
+
+
+      <li data-addable="true"><i class="fa fa-ellipsis-h" data-name="ellipsis-h" aria-hidden="true" data-code="f141"></i> ellipsis-h</li>
+
+      <li data-addable="true"><i class="fa fa-ellipsis-v" data-name="ellipsis-v" aria-hidden="true" data-code="f142"></i> ellipsis-v</li>
+
+      <li data-addable="true"><i class="fa fa-envelope" data-name="envelope" aria-hidden="true" data-code="f0e0"></i> envelope</li>
+
+      <li data-addable="true"><i class="fa fa-envelope-o" data-name="envelope-o" aria-hidden="true" data-code="f003"></i> envelope-o</li>
+
+      <li data-addable="true"><i class="fa fa-envelope-open" data-name="envelope-open" aria-hidden="true" data-code="f2b6"></i> envelope-open</li>
+
+      <li data-addable="true"><i class="fa fa-envelope-open-o" data-name="envelope-open-o" aria-hidden="true" data-code="f2b7"></i> envelope-open-o</li>
+
+      <li data-addable="true"><i class="fa fa-envelope-square" data-name="envelope-square" aria-hidden="true" data-code="f199"></i> envelope-square</li>
+
+      <li data-addable="true"><i class="fa fa-eraser" data-name="eraser" aria-hidden="true" data-code="f12d"></i> eraser</li>
+
+      <li data-addable="true"><i class="fa fa-exchange" data-name="exchange" aria-hidden="true" data-code="f0ec"></i> exchange</li>
+
+      <li data-addable="true"><i class="fa fa-exclamation" data-name="exclamation" aria-hidden="true" data-code="f12a"></i> exclamation</li>
+
+      <li data-addable="true"><i class="fa fa-exclamation-circle" data-name="exclamation-circle" aria-hidden="true" data-code="f06a"></i> exclamation-circle</li>
+
+      <li data-addable="true"><i class="fa fa-exclamation-triangle" data-name="exclamation-triangle" aria-hidden="true" data-code="f071"></i> exclamation-triangle</li>
+
+      <li data-addable="true"><i class="fa fa-external-link" data-name="external-link" aria-hidden="true" data-code="f08e"></i> external-link</li>
+
+      <li data-addable="true"><i class="fa fa-external-link-square" data-name="external-link-square" aria-hidden="true" data-code="f14c"></i> external-link-square</li>
+
+      <li data-addable="true"><i class="fa fa-eye" data-name="eye" aria-hidden="true" data-code="f06e"></i> eye</li>
+
+      <li data-addable="true"><i class="fa fa-eye-slash" data-name="eye-slash" aria-hidden="true" data-code="f070"></i> eye-slash</li>
+
+      <li data-addable="true"><i class="fa fa-eyedropper" data-name="eyedropper" aria-hidden="true" data-code="f1fb"></i> eyedropper</li>
+
+      <li data-addable="true"><i class="fa fa-fax" data-name="fax" aria-hidden="true" data-code="f1ac"></i> fax</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-female" data-name="female" aria-hidden="true" data-code="f182"></i> female</li>
+
+      <li data-addable="true"><i class="fa fa-fighter-jet" data-name="fighter-jet" aria-hidden="true" data-code="f0fb"></i> fighter-jet</li>
+
+      <li data-addable="true"><i class="fa fa-file-archive-o" data-name="file-archive-o" aria-hidden="true" data-code="f1c6"></i> file-archive-o</li>
+
+      <li data-addable="true"><i class="fa fa-file-audio-o" data-name="file-audio-o" aria-hidden="true" data-code="f1c7"></i> file-audio-o</li>
+
+      <li data-addable="true"><i class="fa fa-file-code-o" data-name="file-code-o" aria-hidden="true" data-code="f1c9"></i> file-code-o</li>
+
+      <li data-addable="true"><i class="fa fa-file-excel-o" data-name="file-excel-o" aria-hidden="true" data-code="f1c3"></i> file-excel-o</li>
+
+      <li data-addable="true"><i class="fa fa-file-image-o" data-name="file-image-o" aria-hidden="true" data-code="f1c5"></i> file-image-o</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-file-pdf-o" data-name="file-pdf-o" aria-hidden="true" data-code="f1c1"></i> file-pdf-o</li>
+
+
+
+
+
+      <li data-addable="true"><i class="fa fa-file-powerpoint-o" data-name="file-powerpoint-o" aria-hidden="true" data-code="f1c4"></i> file-powerpoint-o</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-file-video-o" data-name="file-video-o" aria-hidden="true" data-code="f1c8"></i> file-video-o</li>
+
+      <li data-addable="true"><i class="fa fa-file-word-o" data-name="file-word-o" aria-hidden="true" data-code="f1c2"></i> file-word-o</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-film" data-name="film" aria-hidden="true" data-code="f008"></i> film</li>
+
+      <li data-addable="true"><i class="fa fa-filter" data-name="filter" aria-hidden="true" data-code="f0b0"></i> filter</li>
+
+      <li data-addable="true"><i class="fa fa-fire" data-name="fire" aria-hidden="true" data-code="f06d"></i> fire</li>
+
+      <li data-addable="true"><i class="fa fa-fire-extinguisher" data-name="fire-extinguisher" aria-hidden="true" data-code="f134"></i> fire-extinguisher</li>
+
+      <li data-addable="true"><i class="fa fa-flag" data-name="flag" aria-hidden="true" data-code="f024"></i> flag</li>
+
+      <li data-addable="true"><i class="fa fa-flag-checkered" data-name="flag-checkered" aria-hidden="true" data-code="f11e"></i> flag-checkered</li>
+
+      <li data-addable="true"><i class="fa fa-flag-o" data-name="flag-o" aria-hidden="true" data-code="f11d"></i> flag-o</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-flask" data-name="flask" aria-hidden="true" data-code="f0c3"></i> flask</li>
+
+      <li data-addable="true"><i class="fa fa-folder" data-name="folder" aria-hidden="true" data-code="f07b"></i> folder</li>
+
+      <li data-addable="true"><i class="fa fa-folder-o" data-name="folder-o" aria-hidden="true" data-code="f114"></i> folder-o</li>
+
+      <li data-addable="true"><i class="fa fa-folder-open" data-name="folder-open" aria-hidden="true" data-code="f07c"></i> folder-open</li>
+
+      <li data-addable="true"><i class="fa fa-folder-open-o" data-name="folder-open-o" aria-hidden="true" data-code="f115"></i> folder-open-o</li>
+
+      <li data-addable="true"><i class="fa fa-frown-o" data-name="frown-o" aria-hidden="true" data-code="f119"></i> frown-o</li>
+
+      <li data-addable="true"><i class="fa fa-futbol-o" data-name="futbol-o" aria-hidden="true" data-code="f1e3"></i> futbol-o</li>
+
+      <li data-addable="true"><i class="fa fa-gamepad" data-name="gamepad" aria-hidden="true" data-code="f11b"></i> gamepad</li>
+
+      <li data-addable="true"><i class="fa fa-gavel" data-name="gavel" aria-hidden="true" data-code="f0e3"></i> gavel</li>
+
+
+
+
+
+      <li data-addable="true"><i class="fa fa-gift" data-name="gift" aria-hidden="true" data-code="f06b"></i> gift</li>
+
+      <li data-addable="true"><i class="fa fa-glass" data-name="glass" aria-hidden="true" data-code="f000"></i> glass</li>
+
+      <li data-addable="true"><i class="fa fa-globe" data-name="globe" aria-hidden="true" data-code="f0ac"></i> globe</li>
+
+      <li data-addable="true"><i class="fa fa-graduation-cap" data-name="graduation-cap" aria-hidden="true" data-code="f19d"></i> graduation-cap</li>
+
+
+
+
+
+      <li data-addable="true"><i class="fa fa-hand-lizard-o" data-name="hand-lizard-o" aria-hidden="true" data-code="f258"></i> hand-lizard-o</li>
+
+      <li data-addable="true"><i class="fa fa-hand-paper-o" data-name="hand-paper-o" aria-hidden="true" data-code="f256"></i> hand-paper-o</li>
+
+      <li data-addable="true"><i class="fa fa-hand-peace-o" data-name="hand-peace-o" aria-hidden="true" data-code="f25b"></i> hand-peace-o</li>
+
+      <li data-addable="true"><i class="fa fa-hand-pointer-o" data-name="hand-pointer-o" aria-hidden="true" data-code="f25a"></i> hand-pointer-o</li>
+
+      <li data-addable="true"><i class="fa fa-hand-rock-o" data-name="hand-rock-o" aria-hidden="true" data-code="f255"></i> hand-rock-o</li>
+
+      <li data-addable="true"><i class="fa fa-hand-scissors-o" data-name="hand-scissors-o" aria-hidden="true" data-code="f257"></i> hand-scissors-o</li>
+
+      <li data-addable="true"><i class="fa fa-hand-spock-o" data-name="hand-spock-o" aria-hidden="true" data-code="f259"></i> hand-spock-o</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-handshake-o" data-name="handshake-o" aria-hidden="true" data-code="f2b5"></i> handshake-o</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-hashtag" data-name="hashtag" aria-hidden="true" data-code="f292"></i> hashtag</li>
+
+      <li data-addable="true"><i class="fa fa-hdd-o" data-name="hdd-o" aria-hidden="true" data-code="f0a0"></i> hdd-o</li>
+
+      <li data-addable="true"><i class="fa fa-headphones" data-name="headphones" aria-hidden="true" data-code="f025"></i> headphones</li>
+
+      <li data-addable="true"><i class="fa fa-heart" data-name="heart" aria-hidden="true" data-code="f004"></i> heart</li>
+
+      <li data-addable="true"><i class="fa fa-heart-o" data-name="heart-o" aria-hidden="true" data-code="f08a"></i> heart-o</li>
+
+      <li data-addable="true"><i class="fa fa-heartbeat" data-name="heartbeat" aria-hidden="true" data-code="f21e"></i> heartbeat</li>
+
+      <li data-addable="true"><i class="fa fa-history" data-name="history" aria-hidden="true" data-code="f1da"></i> history</li>
+
+      <li data-addable="true"><i class="fa fa-home" data-name="home" aria-hidden="true" data-code="f015"></i> home</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-hourglass" data-name="hourglass" aria-hidden="true" data-code="f254"></i> hourglass</li>
+
+
+
+
+
+
+
+      <li data-addable="true"><i class="fa fa-hourglass-end" data-name="hourglass-end" aria-hidden="true" data-code="f253"></i> hourglass-end</li>
+
+      <li data-addable="true"><i class="fa fa-hourglass-half" data-name="hourglass-half" aria-hidden="true" data-code="f252"></i> hourglass-half</li>
+
+      <li data-addable="true"><i class="fa fa-hourglass-o" data-name="hourglass-o" aria-hidden="true" data-code="f250"></i> hourglass-o</li>
+
+      <li data-addable="true"><i class="fa fa-hourglass-start" data-name="hourglass-start" aria-hidden="true" data-code="f251"></i> hourglass-start</li>
+
+      <li data-addable="true"><i class="fa fa-i-cursor" data-name="i-cursor" aria-hidden="true" data-code="f246"></i> i-cursor</li>
+
+      <li data-addable="true"><i class="fa fa-id-badge" data-name="id-badge" aria-hidden="true" data-code="f2c1"></i> id-badge</li>
+
+      <li data-addable="true"><i class="fa fa-id-card" data-name="id-card" aria-hidden="true" data-code="f2c2"></i> id-card</li>
+
+      <li data-addable="true"><i class="fa fa-id-card-o" data-name="id-card-o" aria-hidden="true" data-code="f2c3"></i> id-card-o</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-inbox" data-name="inbox" aria-hidden="true" data-code="f01c"></i> inbox</li>
+
+      <li data-addable="true"><i class="fa fa-industry" data-name="industry" aria-hidden="true" data-code="f275"></i> industry</li>
+
+      <li data-addable="true"><i class="fa fa-info" data-name="info" aria-hidden="true" data-code="f129"></i> info</li>
+
+      <li data-addable="true"><i class="fa fa-info-circle" data-name="info-circle" aria-hidden="true" data-code="f05a"></i> info-circle</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-key" data-name="key" aria-hidden="true" data-code="f084"></i> key</li>
+
+      <li data-addable="true"><i class="fa fa-keyboard-o" data-name="keyboard-o" aria-hidden="true" data-code="f11c"></i> keyboard-o</li>
+
+      <li data-addable="true"><i class="fa fa-language" data-name="language" aria-hidden="true" data-code="f1ab"></i> language</li>
+
+      <li data-addable="true"><i class="fa fa-laptop" data-name="laptop" aria-hidden="true" data-code="f109"></i> laptop</li>
+
+      <li data-addable="true"><i class="fa fa-leaf" data-name="leaf" aria-hidden="true" data-code="f06c"></i> leaf</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-lemon-o" data-name="lemon-o" aria-hidden="true" data-code="f094"></i> lemon-o</li>
+
+      <li data-addable="true"><i class="fa fa-level-down" data-name="level-down" aria-hidden="true" data-code="f149"></i> level-down</li>
+
+      <li data-addable="true"><i class="fa fa-level-up" data-name="level-up" aria-hidden="true" data-code="f148"></i> level-up</li>
+
+
+
+
+
+      <li data-addable="true"><i class="fa fa-life-ring" data-name="life-ring" aria-hidden="true" data-code="f1cd"></i> life-ring</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-lightbulb-o" data-name="lightbulb-o" aria-hidden="true" data-code="f0eb"></i> lightbulb-o</li>
+
+      <li data-addable="true"><i class="fa fa-line-chart" data-name="line-chart" aria-hidden="true" data-code="f201"></i> line-chart</li>
+
+      <li data-addable="true"><i class="fa fa-location-arrow" data-name="location-arrow" aria-hidden="true" data-code="f124"></i> location-arrow</li>
+
+      <li data-addable="true"><i class="fa fa-lock" data-name="lock" aria-hidden="true" data-code="f023"></i> lock</li>
+
+      <li data-addable="true"><i class="fa fa-low-vision" data-name="low-vision" aria-hidden="true" data-code="f2a8"></i> low-vision</li>
+
+      <li data-addable="true"><i class="fa fa-magic" data-name="magic" aria-hidden="true" data-code="f0d0"></i> magic</li>
+
+      <li data-addable="true"><i class="fa fa-magnet" data-name="magnet" aria-hidden="true" data-code="f076"></i> magnet</li>
+
+
+
+
+
+
+
+      <li data-addable="true"><i class="fa fa-male" data-name="male" aria-hidden="true" data-code="f183"></i> male</li>
+
+      <li data-addable="true"><i class="fa fa-map" data-name="map" aria-hidden="true" data-code="f279"></i> map</li>
+
+      <li data-addable="true"><i class="fa fa-map-marker" data-name="map-marker" aria-hidden="true" data-code="f041"></i> map-marker</li>
+
+      <li data-addable="true"><i class="fa fa-map-o" data-name="map-o" aria-hidden="true" data-code="f278"></i> map-o</li>
+
+      <li data-addable="true"><i class="fa fa-map-pin" data-name="map-pin" aria-hidden="true" data-code="f276"></i> map-pin</li>
+
+      <li data-addable="true"><i class="fa fa-map-signs" data-name="map-signs" aria-hidden="true" data-code="f277"></i> map-signs</li>
+
+      <li data-addable="true"><i class="fa fa-meh-o" data-name="meh-o" aria-hidden="true" data-code="f11a"></i> meh-o</li>
+
+      <li data-addable="true"><i class="fa fa-microchip" data-name="microchip" aria-hidden="true" data-code="f2db"></i> microchip</li>
+
+      <li data-addable="true"><i class="fa fa-microphone" data-name="microphone" aria-hidden="true" data-code="f130"></i> microphone</li>
+
+      <li data-addable="true"><i class="fa fa-microphone-slash" data-name="microphone-slash" aria-hidden="true" data-code="f131"></i> microphone-slash</li>
+
+      <li data-addable="true"><i class="fa fa-minus" data-name="minus" aria-hidden="true" data-code="f068"></i> minus</li>
+
+      <li data-addable="true"><i class="fa fa-minus-circle" data-name="minus-circle" aria-hidden="true" data-code="f056"></i> minus-circle</li>
+
+      <li data-addable="true"><i class="fa fa-minus-square" data-name="minus-square" aria-hidden="true" data-code="f146"></i> minus-square</li>
+
+      <li data-addable="true"><i class="fa fa-minus-square-o" data-name="minus-square-o" aria-hidden="true" data-code="f147"></i> minus-square-o</li>
+
+      <li data-addable="true"><i class="fa fa-mobile" data-name="mobile" aria-hidden="true" data-code="f10b"></i> mobile</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-money" data-name="money" aria-hidden="true" data-code="f0d6"></i> money</li>
+
+      <li data-addable="true"><i class="fa fa-moon-o" data-name="moon-o" aria-hidden="true" data-code="f186"></i> moon-o</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-motorcycle" data-name="motorcycle" aria-hidden="true" data-code="f21c"></i> motorcycle</li>
+
+      <li data-addable="true"><i class="fa fa-mouse-pointer" data-name="mouse-pointer" aria-hidden="true" data-code="f245"></i> mouse-pointer</li>
+
+      <li data-addable="true"><i class="fa fa-music" data-name="music" aria-hidden="true" data-code="f001"></i> music</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-newspaper-o" data-name="newspaper-o" aria-hidden="true" data-code="f1ea"></i> newspaper-o</li>
+
+      <li data-addable="true"><i class="fa fa-object-group" data-name="object-group" aria-hidden="true" data-code="f247"></i> object-group</li>
+
+      <li data-addable="true"><i class="fa fa-object-ungroup" data-name="object-ungroup" aria-hidden="true" data-code="f248"></i> object-ungroup</li>
+
+      <li data-addable="true"><i class="fa fa-paint-brush" data-name="paint-brush" aria-hidden="true" data-code="f1fc"></i> paint-brush</li>
+
+      <li data-addable="true"><i class="fa fa-paper-plane" data-name="paper-plane" aria-hidden="true" data-code="f1d8"></i> paper-plane</li>
+
+      <li data-addable="true"><i class="fa fa-paper-plane-o" data-name="paper-plane-o" aria-hidden="true" data-code="f1d9"></i> paper-plane-o</li>
+
+      <li data-addable="true"><i class="fa fa-paw" data-name="paw" aria-hidden="true" data-code="f1b0"></i> paw</li>
+
+      <li data-addable="true"><i class="fa fa-pencil" data-name="pencil" aria-hidden="true" data-code="f040"></i> pencil</li>
+
+      <li data-addable="true"><i class="fa fa-pencil-square" data-name="pencil-square" aria-hidden="true" data-code="f14b"></i> pencil-square</li>
+
+      <li data-addable="true"><i class="fa fa-pencil-square-o" data-name="pencil-square-o" aria-hidden="true" data-code="f044"></i> pencil-square-o</li>
+
+      <li data-addable="true"><i class="fa fa-percent" data-name="percent" aria-hidden="true" data-code="f295"></i> percent</li>
+
+      <li data-addable="true"><i class="fa fa-phone" data-name="phone" aria-hidden="true" data-code="f095"></i> phone</li>
+
+      <li data-addable="true"><i class="fa fa-phone-square" data-name="phone-square" aria-hidden="true" data-code="f098"></i> phone-square</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-picture-o" data-name="picture-o" aria-hidden="true" data-code="f03e"></i> picture-o</li>
+
+      <li data-addable="true"><i class="fa fa-pie-chart" data-name="pie-chart" aria-hidden="true" data-code="f200"></i> pie-chart</li>
+
+      <li data-addable="true"><i class="fa fa-plane" data-name="plane" aria-hidden="true" data-code="f072"></i> plane</li>
+
+      <li data-addable="true"><i class="fa fa-plug" data-name="plug" aria-hidden="true" data-code="f1e6"></i> plug</li>
+
+      <li data-addable="true"><i class="fa fa-plus" data-name="plus" aria-hidden="true" data-code="f067"></i> plus</li>
+
+      <li data-addable="true"><i class="fa fa-plus-circle" data-name="plus-circle" aria-hidden="true" data-code="f055"></i> plus-circle</li>
+
+      <li data-addable="true"><i class="fa fa-plus-square" data-name="plus-square" aria-hidden="true" data-code="f0fe"></i> plus-square</li>
+
+      <li data-addable="true"><i class="fa fa-plus-square-o" data-name="plus-square-o" aria-hidden="true" data-code="f196"></i> plus-square-o</li>
+
+      <li data-addable="true"><i class="fa fa-podcast" data-name="podcast" aria-hidden="true" data-code="f2ce"></i> podcast</li>
+
+      <li data-addable="true"><i class="fa fa-power-off" data-name="power-off" aria-hidden="true" data-code="f011"></i> power-off</li>
+
+      <li data-addable="true"><i class="fa fa-print" data-name="print" aria-hidden="true" data-code="f02f"></i> print</li>
+
+      <li data-addable="true"><i class="fa fa-puzzle-piece" data-name="puzzle-piece" aria-hidden="true" data-code="f12e"></i> puzzle-piece</li>
+
+      <li data-addable="true"><i class="fa fa-qrcode" data-name="qrcode" aria-hidden="true" data-code="f029"></i> qrcode</li>
+
+      <li data-addable="true"><i class="fa fa-question" data-name="question" aria-hidden="true" data-code="f128"></i> question</li>
+
+      <li data-addable="true"><i class="fa fa-question-circle" data-name="question-circle" aria-hidden="true" data-code="f059"></i> question-circle</li>
+
+      <li data-addable="true"><i class="fa fa-question-circle-o" data-name="question-circle-o" aria-hidden="true" data-code="f29c"></i> question-circle-o</li>
+
+      <li data-addable="true"><i class="fa fa-quote-left" data-name="quote-left" aria-hidden="true" data-code="f10d"></i> quote-left</li>
+
+      <li data-addable="true"><i class="fa fa-quote-right" data-name="quote-right" aria-hidden="true" data-code="f10e"></i> quote-right</li>
+
+      <li data-addable="true"><i class="fa fa-random" data-name="random" aria-hidden="true" data-code="f074"></i> random</li>
+
+      <li data-addable="true"><i class="fa fa-recycle" data-name="recycle" aria-hidden="true" data-code="f1b8"></i> recycle</li>
+
+      <li data-addable="true"><i class="fa fa-refresh" data-name="refresh" aria-hidden="true" data-code="f021"></i> refresh</li>
+
+      <li data-addable="true"><i class="fa fa-registered" data-name="registered" aria-hidden="true" data-code="f25d"></i> registered</li>
+
+
+
+
+
+      <li data-addable="true"><i class="fa fa-reply" data-name="reply" aria-hidden="true" data-code="f112"></i> reply</li>
+
+      <li data-addable="true"><i class="fa fa-reply-all" data-name="reply-all" aria-hidden="true" data-code="f122"></i> reply-all</li>
+
+      <li data-addable="true"><i class="fa fa-retweet" data-name="retweet" aria-hidden="true" data-code="f079"></i> retweet</li>
+
+      <li data-addable="true"><i class="fa fa-road" data-name="road" aria-hidden="true" data-code="f018"></i> road</li>
+
+      <li data-addable="true"><i class="fa fa-rocket" data-name="rocket" aria-hidden="true" data-code="f135"></i> rocket</li>
+
+      <li data-addable="true"><i class="fa fa-rss" data-name="rss" aria-hidden="true" data-code="f09e"></i> rss</li>
+
+      <li data-addable="true"><i class="fa fa-rss-square" data-name="rss-square" aria-hidden="true" data-code="f143"></i> rss-square</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-search" data-name="search" aria-hidden="true" data-code="f002"></i> search</li>
+
+      <li data-addable="true"><i class="fa fa-search-minus" data-name="search-minus" aria-hidden="true" data-code="f010"></i> search-minus</li>
+
+      <li data-addable="true"><i class="fa fa-search-plus" data-name="search-plus" aria-hidden="true" data-code="f00e"></i> search-plus</li>
+
+
+
+
+
+      <li data-addable="true"><i class="fa fa-server" data-name="server" aria-hidden="true" data-code="f233"></i> server</li>
+
+      <li data-addable="true"><i class="fa fa-share" data-name="share" aria-hidden="true" data-code="f064"></i> share</li>
+
+      <li data-addable="true"><i class="fa fa-share-alt" data-name="share-alt" aria-hidden="true" data-code="f1e0"></i> share-alt</li>
+
+      <li data-addable="true"><i class="fa fa-share-alt-square" data-name="share-alt-square" aria-hidden="true" data-code="f1e1"></i> share-alt-square</li>
+
+      <li data-addable="true"><i class="fa fa-share-square" data-name="share-square" aria-hidden="true" data-code="f14d"></i> share-square</li>
+
+      <li data-addable="true"><i class="fa fa-share-square-o" data-name="share-square-o" aria-hidden="true" data-code="f045"></i> share-square-o</li>
+
+      <li data-addable="true"><i class="fa fa-shield" data-name="shield" aria-hidden="true" data-code="f132"></i> shield</li>
+
+      <li data-addable="true"><i class="fa fa-ship" data-name="ship" aria-hidden="true" data-code="f21a"></i> ship</li>
+
+      <li data-addable="true"><i class="fa fa-shopping-bag" data-name="shopping-bag" aria-hidden="true" data-code="f290"></i> shopping-bag</li>
+
+      <li data-addable="true"><i class="fa fa-shopping-basket" data-name="shopping-basket" aria-hidden="true" data-code="f291"></i> shopping-basket</li>
+
+      <li data-addable="true"><i class="fa fa-shopping-cart" data-name="shopping-cart" aria-hidden="true" data-code="f07a"></i> shopping-cart</li>
+
+      <li data-addable="true"><i class="fa fa-shower" data-name="shower" aria-hidden="true" data-code="f2cc"></i> shower</li>
+
+      <li data-addable="true"><i class="fa fa-sign-in" data-name="sign-in" aria-hidden="true" data-code="f090"></i> sign-in</li>
+
+      <li data-addable="true"><i class="fa fa-sign-language" data-name="sign-language" aria-hidden="true" data-code="f2a7"></i> sign-language</li>
+
+      <li data-addable="true"><i class="fa fa-sign-out" data-name="sign-out" aria-hidden="true" data-code="f08b"></i> sign-out</li>
+
+      <li data-addable="true"><i class="fa fa-signal" data-name="signal" aria-hidden="true" data-code="f012"></i> signal</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-sitemap" data-name="sitemap" aria-hidden="true" data-code="f0e8"></i> sitemap</li>
+
+      <li data-addable="true"><i class="fa fa-sliders" data-name="sliders" aria-hidden="true" data-code="f1de"></i> sliders</li>
+
+      <li data-addable="true"><i class="fa fa-smile-o" data-name="smile-o" aria-hidden="true" data-code="f118"></i> smile-o</li>
+
+      <li data-addable="true"><i class="fa fa-snowflake-o" data-name="snowflake-o" aria-hidden="true" data-code="f2dc"></i> snowflake-o</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-sort" data-name="sort" aria-hidden="true" data-code="f0dc"></i> sort</li>
+
+      <li data-addable="true"><i class="fa fa-sort-alpha-asc" data-name="sort-alpha-asc" aria-hidden="true" data-code="f15d"></i> sort-alpha-asc</li>
+
+      <li data-addable="true"><i class="fa fa-sort-alpha-desc" data-name="sort-alpha-desc" aria-hidden="true" data-code="f15e"></i> sort-alpha-desc</li>
+
+      <li data-addable="true"><i class="fa fa-sort-amount-asc" data-name="sort-amount-asc" aria-hidden="true" data-code="f160"></i> sort-amount-asc</li>
+
+      <li data-addable="true"><i class="fa fa-sort-amount-desc" data-name="sort-amount-desc" aria-hidden="true" data-code="f161"></i> sort-amount-desc</li>
+
+      <li data-addable="true"><i class="fa fa-sort-asc" data-name="sort-asc" aria-hidden="true" data-code="f0de"></i> sort-asc</li>
+
+      <li data-addable="true"><i class="fa fa-sort-desc" data-name="sort-desc" aria-hidden="true" data-code="f0dd"></i> sort-desc</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-sort-numeric-asc" data-name="sort-numeric-asc" aria-hidden="true" data-code="f162"></i> sort-numeric-asc</li>
+
+      <li data-addable="true"><i class="fa fa-sort-numeric-desc" data-name="sort-numeric-desc" aria-hidden="true" data-code="f163"></i> sort-numeric-desc</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-space-shuttle" data-name="space-shuttle" aria-hidden="true" data-code="f197"></i> space-shuttle</li>
+
+      <li data-addable="true"><i class="fa fa-spinner" data-name="spinner" aria-hidden="true" data-code="f110"></i> spinner</li>
+
+      <li data-addable="true"><i class="fa fa-spoon" data-name="spoon" aria-hidden="true" data-code="f1b1"></i> spoon</li>
+
+      <li data-addable="true"><i class="fa fa-square" data-name="square" aria-hidden="true" data-code="f0c8"></i> square</li>
+
+      <li data-addable="true"><i class="fa fa-square-o" data-name="square-o" aria-hidden="true" data-code="f096"></i> square-o</li>
+
+      <li data-addable="true"><i class="fa fa-star" data-name="star" aria-hidden="true" data-code="f005"></i> star</li>
+
+      <li data-addable="true"><i class="fa fa-star-half" data-name="star-half" aria-hidden="true" data-code="f089"></i> star-half</li>
+
+
+
+
+
+      <li data-addable="true"><i class="fa fa-star-half-o" data-name="star-half-o" aria-hidden="true" data-code="f123"></i> star-half-o</li>
+
+      <li data-addable="true"><i class="fa fa-star-o" data-name="star-o" aria-hidden="true" data-code="f006"></i> star-o</li>
+
+      <li data-addable="true"><i class="fa fa-sticky-note" data-name="sticky-note" aria-hidden="true" data-code="f249"></i> sticky-note</li>
+
+      <li data-addable="true"><i class="fa fa-sticky-note-o" data-name="sticky-note-o" aria-hidden="true" data-code="f24a"></i> sticky-note-o</li>
+
+      <li data-addable="true"><i class="fa fa-street-view" data-name="street-view" aria-hidden="true" data-code="f21d"></i> street-view</li>
+
+      <li data-addable="true"><i class="fa fa-suitcase" data-name="suitcase" aria-hidden="true" data-code="f0f2"></i> suitcase</li>
+
+      <li data-addable="true"><i class="fa fa-sun-o" data-name="sun-o" aria-hidden="true" data-code="f185"></i> sun-o</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-tablet" data-name="tablet" aria-hidden="true" data-code="f10a"></i> tablet</li>
+
+      <li data-addable="true"><i class="fa fa-tachometer" data-name="tachometer" aria-hidden="true" data-code="f0e4"></i> tachometer</li>
+
+      <li data-addable="true"><i class="fa fa-tag" data-name="tag" aria-hidden="true" data-code="f02b"></i> tag</li>
+
+      <li data-addable="true"><i class="fa fa-tags" data-name="tags" aria-hidden="true" data-code="f02c"></i> tags</li>
+
+      <li data-addable="true"><i class="fa fa-tasks" data-name="tasks" aria-hidden="true" data-code="f0ae"></i> tasks</li>
+
+      <li data-addable="true"><i class="fa fa-taxi" data-name="taxi" aria-hidden="true" data-code="f1ba"></i> taxi</li>
+
+      <li data-addable="true"><i class="fa fa-television" data-name="television" aria-hidden="true" data-code="f26c"></i> television</li>
+
+      <li data-addable="true"><i class="fa fa-terminal" data-name="terminal" aria-hidden="true" data-code="f120"></i> terminal</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <li data-addable="true"><i class="fa fa-thermometer-empty" data-name="thermometer-empty" aria-hidden="true" data-code="f2cb"></i> thermometer-empty</li>
+
+      <li data-addable="true"><i class="fa fa-thermometer-full" data-name="thermometer-full" aria-hidden="true" data-code="f2c7"></i> thermometer-full</li>
+
+      <li data-addable="true"><i class="fa fa-thermometer-half" data-name="thermometer-half" aria-hidden="true" data-code="f2c9"></i> thermometer-half</li>
+
+      <li data-addable="true"><i class="fa fa-thermometer-quarter" data-name="thermometer-quarter" aria-hidden="true" data-code="f2ca"></i> thermometer-quarter</li>
+
+      <li data-addable="true"><i class="fa fa-thermometer-three-quarters" data-name="thermometer-three-quarters" aria-hidden="true" data-code="f2c8"></i> thermometer-three-quarters</li>
+
+      <li data-addable="true"><i class="fa fa-thumb-tack" data-name="thumb-tack" aria-hidden="true" data-code="f08d"></i> thumb-tack</li>
+
+      <li data-addable="true"><i class="fa fa-thumbs-down" data-name="thumbs-down" aria-hidden="true" data-code="f165"></i> thumbs-down</li>
+
+      <li data-addable="true"><i class="fa fa-thumbs-o-down" data-name="thumbs-o-down" aria-hidden="true" data-code="f088"></i> thumbs-o-down</li>
+
+      <li data-addable="true"><i class="fa fa-thumbs-o-up" data-name="thumbs-o-up" aria-hidden="true" data-code="f087"></i> thumbs-o-up</li>
+
+      <li data-addable="true"><i class="fa fa-thumbs-up" data-name="thumbs-up" aria-hidden="true" data-code="f164"></i> thumbs-up</li>
+
+      <li data-addable="true"><i class="fa fa-ticket" data-name="ticket" aria-hidden="true" data-code="f145"></i> ticket</li>
+
+      <li data-addable="true"><i class="fa fa-times" data-name="times" aria-hidden="true" data-code="f00d"></i> times</li>
+
+      <li data-addable="true"><i class="fa fa-times-circle" data-name="times-circle" aria-hidden="true" data-code="f057"></i> times-circle</li>
+
+      <li data-addable="true"><i class="fa fa-times-circle-o" data-name="times-circle-o" aria-hidden="true" data-code="f05c"></i> times-circle-o</li>
+
+
+
+
+
+      <li data-addable="true"><i class="fa fa-tint" data-name="tint" aria-hidden="true" data-code="f043"></i> tint</li>
+
+
+
+
+
+      <li data-addable="true"><i class="fa fa-toggle-off" data-name="toggle-off" aria-hidden="true" data-code="f204"></i> toggle-off</li>
+
+      <li data-addable="true"><i class="fa fa-toggle-on" data-name="toggle-on" aria-hidden="true" data-code="f205"></i> toggle-on</li>
+
+
+
+
+
+      <li data-addable="true"><i class="fa fa-trademark" data-name="trademark" aria-hidden="true" data-code="f25c"></i> trademark</li>
+
+      <li data-addable="true"><i class="fa fa-trash" data-name="trash" aria-hidden="true" data-code="f1f8"></i> trash</li>
+
+      <li data-addable="true"><i class="fa fa-trash-o" data-name="trash-o" aria-hidden="true" data-code="f014"></i> trash-o</li>
+
+      <li data-addable="true"><i class="fa fa-tree" data-name="tree" aria-hidden="true" data-code="f1bb"></i> tree</li>
+
+      <li data-addable="true"><i class="fa fa-trophy" data-name="trophy" aria-hidden="true" data-code="f091"></i> trophy</li>
+
+      <li data-addable="true"><i class="fa fa-truck" data-name="truck" aria-hidden="true" data-code="f0d1"></i> truck</li>
+
+      <li data-addable="true"><i class="fa fa-tty" data-name="tty" aria-hidden="true" data-code="f1e4"></i> tty</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-umbrella" data-name="umbrella" aria-hidden="true" data-code="f0e9"></i> umbrella</li>
+
+      <li data-addable="true"><i class="fa fa-universal-access" data-name="universal-access" aria-hidden="true" data-code="f29a"></i> universal-access</li>
+
+      <li data-addable="true"><i class="fa fa-university" data-name="university" aria-hidden="true" data-code="f19c"></i> university</li>
+
+      <li data-addable="true"><i class="fa fa-unlock" data-name="unlock" aria-hidden="true" data-code="f09c"></i> unlock</li>
+
+      <li data-addable="true"><i class="fa fa-unlock-alt" data-name="unlock-alt" aria-hidden="true" data-code="f13e"></i> unlock-alt</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-upload" data-name="upload" aria-hidden="true" data-code="f093"></i> upload</li>
+
+      <li data-addable="true"><i class="fa fa-user" data-name="user" aria-hidden="true" data-code="f007"></i> user</li>
+
+      <li data-addable="true"><i class="fa fa-user-circle" data-name="user-circle" aria-hidden="true" data-code="f2bd"></i> user-circle</li>
+
+      <li data-addable="true"><i class="fa fa-user-circle-o" data-name="user-circle-o" aria-hidden="true" data-code="f2be"></i> user-circle-o</li>
+
+      <li data-addable="true"><i class="fa fa-user-o" data-name="user-o" aria-hidden="true" data-code="f2c0"></i> user-o</li>
+
+      <li data-addable="true"><i class="fa fa-user-plus" data-name="user-plus" aria-hidden="true" data-code="f234"></i> user-plus</li>
+
+      <li data-addable="true"><i class="fa fa-user-secret" data-name="user-secret" aria-hidden="true" data-code="f21b"></i> user-secret</li>
+
+      <li data-addable="true"><i class="fa fa-user-times" data-name="user-times" aria-hidden="true" data-code="f235"></i> user-times</li>
+
+      <li data-addable="true"><i class="fa fa-users" data-name="users" aria-hidden="true" data-code="f0c0"></i> users</li>
+
+
+
+
+
+      <li data-addable="true"><i class="fa fa-video-camera" data-name="video-camera" aria-hidden="true" data-code="f03d"></i> video-camera</li>
+
+      <li data-addable="true"><i class="fa fa-volume-control-phone" data-name="volume-control-phone" aria-hidden="true" data-code="f2a0"></i> volume-control-phone</li>
+
+      <li data-addable="true"><i class="fa fa-volume-down" data-name="volume-down" aria-hidden="true" data-code="f027"></i> volume-down</li>
+
+      <li data-addable="true"><i class="fa fa-volume-off" data-name="volume-off" aria-hidden="true" data-code="f026"></i> volume-off</li>
+
+      <li data-addable="true"><i class="fa fa-volume-up" data-name="volume-up" aria-hidden="true" data-code="f028"></i> volume-up</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-wheelchair" data-name="wheelchair" aria-hidden="true" data-code="f193"></i> wheelchair</li>
+
+      <li data-addable="true"><i class="fa fa-wheelchair-alt" data-name="wheelchair-alt" aria-hidden="true" data-code="f29b"></i> wheelchair-alt</li>
+
+      <li data-addable="true"><i class="fa fa-wifi" data-name="wifi" aria-hidden="true" data-code="f1eb"></i> wifi</li>
+
+      <li data-addable="true"><i class="fa fa-window-close" data-name="window-close" aria-hidden="true" data-code="f2d3"></i> window-close</li>
+
+      <li data-addable="true"><i class="fa fa-window-close-o" data-name="window-close-o" aria-hidden="true" data-code="f2d4"></i> window-close-o</li>
+
+      <li data-addable="true"><i class="fa fa-window-maximize" data-name="window-maximize" aria-hidden="true" data-code="f2d0"></i> window-maximize</li>
+
+      <li data-addable="true"><i class="fa fa-window-minimize" data-name="window-minimize" aria-hidden="true" data-code="f2d1"></i> window-minimize</li>
+
+      <li data-addable="true"><i class="fa fa-window-restore" data-name="window-restore" aria-hidden="true" data-code="f2d2"></i> window-restore</li>
+
+      <li data-addable="true"><i class="fa fa-wrench" data-name="wrench" aria-hidden="true" data-code="f0ad"></i> wrench</li>
+
+  </ul>
+
+</section>
+
+    <section id="accessibility">
+  <h2 class="page-header">Accessibility Icons</h2>
+
+  <ul>
+
+
+
+      <li data-addable="true"><i class="fa fa-american-sign-language-interpreting" data-name="american-sign-language-interpreting" aria-hidden="true" data-code="f2a3"></i> american-sign-language-interpreting</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-assistive-listening-systems" data-name="assistive-listening-systems" aria-hidden="true" data-code="f2a2"></i> assistive-listening-systems</li>
+
+      <li data-addable="true"><i class="fa fa-audio-description" data-name="audio-description" aria-hidden="true" data-code="f29e"></i> audio-description</li>
+
+      <li data-addable="true"><i class="fa fa-blind" data-name="blind" aria-hidden="true" data-code="f29d"></i> blind</li>
+
+      <li data-addable="true"><i class="fa fa-braille" data-name="braille" aria-hidden="true" data-code="f2a1"></i> braille</li>
+
+      <li data-addable="true"><i class="fa fa-cc" data-name="cc" aria-hidden="true" data-code="f20a"></i> cc</li>
+
+      <li data-addable="true"><i class="fa fa-deaf" data-name="deaf" aria-hidden="true" data-code="f2a4"></i> deaf</li>
+
+
+
+
+
+      <li data-addable="true"><i class="fa fa-low-vision" data-name="low-vision" aria-hidden="true" data-code="f2a8"></i> low-vision</li>
+
+      <li data-addable="true"><i class="fa fa-question-circle-o" data-name="question-circle-o" aria-hidden="true" data-code="f29c"></i> question-circle-o</li>
+
+      <li data-addable="true"><i class="fa fa-sign-language" data-name="sign-language" aria-hidden="true" data-code="f2a7"></i> sign-language</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-tty" data-name="tty" aria-hidden="true" data-code="f1e4"></i> tty</li>
+
+      <li data-addable="true"><i class="fa fa-universal-access" data-name="universal-access" aria-hidden="true" data-code="f29a"></i> universal-access</li>
+
+      <li data-addable="true"><i class="fa fa-volume-control-phone" data-name="volume-control-phone" aria-hidden="true" data-code="f2a0"></i> volume-control-phone</li>
+
+      <li data-addable="true"><i class="fa fa-wheelchair" data-name="wheelchair" aria-hidden="true" data-code="f193"></i> wheelchair</li>
+
+      <li data-addable="true"><i class="fa fa-wheelchair-alt" data-name="wheelchair-alt" aria-hidden="true" data-code="f29b"></i> wheelchair-alt</li>
+
+  </ul>
+
+</section>
+
+    <section id="hand">
+  <h2 class="page-header">Hand Icons</h2>
+
+  <ul>
+
+
+
+
+
+      <li data-addable="true"><i class="fa fa-hand-lizard-o" data-name="hand-lizard-o" aria-hidden="true" data-code="f258"></i> hand-lizard-o</li>
+
+      <li data-addable="true"><i class="fa fa-hand-o-down" data-name="hand-o-down" aria-hidden="true" data-code="f0a7"></i> hand-o-down</li>
+
+      <li data-addable="true"><i class="fa fa-hand-o-left" data-name="hand-o-left" aria-hidden="true" data-code="f0a5"></i> hand-o-left</li>
+
+      <li data-addable="true"><i class="fa fa-hand-o-right" data-name="hand-o-right" aria-hidden="true" data-code="f0a4"></i> hand-o-right</li>
+
+      <li data-addable="true"><i class="fa fa-hand-o-up" data-name="hand-o-up" aria-hidden="true" data-code="f0a6"></i> hand-o-up</li>
+
+      <li data-addable="true"><i class="fa fa-hand-paper-o" data-name="hand-paper-o" aria-hidden="true" data-code="f256"></i> hand-paper-o</li>
+
+      <li data-addable="true"><i class="fa fa-hand-peace-o" data-name="hand-peace-o" aria-hidden="true" data-code="f25b"></i> hand-peace-o</li>
+
+      <li data-addable="true"><i class="fa fa-hand-pointer-o" data-name="hand-pointer-o" aria-hidden="true" data-code="f25a"></i> hand-pointer-o</li>
+
+      <li data-addable="true"><i class="fa fa-hand-rock-o" data-name="hand-rock-o" aria-hidden="true" data-code="f255"></i> hand-rock-o</li>
+
+      <li data-addable="true"><i class="fa fa-hand-scissors-o" data-name="hand-scissors-o" aria-hidden="true" data-code="f257"></i> hand-scissors-o</li>
+
+      <li data-addable="true"><i class="fa fa-hand-spock-o" data-name="hand-spock-o" aria-hidden="true" data-code="f259"></i> hand-spock-o</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-thumbs-down" data-name="thumbs-down" aria-hidden="true" data-code="f165"></i> thumbs-down</li>
+
+      <li data-addable="true"><i class="fa fa-thumbs-o-down" data-name="thumbs-o-down" aria-hidden="true" data-code="f088"></i> thumbs-o-down</li>
+
+      <li data-addable="true"><i class="fa fa-thumbs-o-up" data-name="thumbs-o-up" aria-hidden="true" data-code="f087"></i> thumbs-o-up</li>
+
+      <li data-addable="true"><i class="fa fa-thumbs-up" data-name="thumbs-up" aria-hidden="true" data-code="f164"></i> thumbs-up</li>
+
+  </ul>
+
+</section>
+
+    <section id="transportation">
+  <h2 class="page-header">Transportation Icons</h2>
+
+  <ul>
+
+
+
+      <li data-addable="true"><i class="fa fa-ambulance" data-name="ambulance" aria-hidden="true" data-code="f0f9"></i> ambulance</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-bicycle" data-name="bicycle" aria-hidden="true" data-code="f206"></i> bicycle</li>
+
+      <li data-addable="true"><i class="fa fa-bus" data-name="bus" aria-hidden="true" data-code="f207"></i> bus</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-car" data-name="car" aria-hidden="true" data-code="f1b9"></i> car</li>
+
+      <li data-addable="true"><i class="fa fa-fighter-jet" data-name="fighter-jet" aria-hidden="true" data-code="f0fb"></i> fighter-jet</li>
+
+      <li data-addable="true"><i class="fa fa-motorcycle" data-name="motorcycle" aria-hidden="true" data-code="f21c"></i> motorcycle</li>
+
+      <li data-addable="true"><i class="fa fa-plane" data-name="plane" aria-hidden="true" data-code="f072"></i> plane</li>
+
+      <li data-addable="true"><i class="fa fa-rocket" data-name="rocket" aria-hidden="true" data-code="f135"></i> rocket</li>
+
+      <li data-addable="true"><i class="fa fa-ship" data-name="ship" aria-hidden="true" data-code="f21a"></i> ship</li>
+
+      <li data-addable="true"><i class="fa fa-space-shuttle" data-name="space-shuttle" aria-hidden="true" data-code="f197"></i> space-shuttle</li>
+
+      <li data-addable="true"><i class="fa fa-subway" data-name="subway" aria-hidden="true" data-code="f239"></i> subway</li>
+
+      <li data-addable="true"><i class="fa fa-taxi" data-name="taxi" aria-hidden="true" data-code="f1ba"></i> taxi</li>
+
+      <li data-addable="true"><i class="fa fa-train" data-name="train" aria-hidden="true" data-code="f238"></i> train</li>
+
+      <li data-addable="true"><i class="fa fa-truck" data-name="truck" aria-hidden="true" data-code="f0d1"></i> truck</li>
+
+      <li data-addable="true"><i class="fa fa-wheelchair" data-name="wheelchair" aria-hidden="true" data-code="f193"></i> wheelchair</li>
+
+      <li data-addable="true"><i class="fa fa-wheelchair-alt" data-name="wheelchair-alt" aria-hidden="true" data-code="f29b"></i> wheelchair-alt</li>
+
+  </ul>
+
+</section>
+
+    <section id="gender">
+  <h2 class="page-header">Gender Icons</h2>
+
+  <ul>
+
+
+
+      <li data-addable="true"><i class="fa fa-genderless" data-name="genderless" aria-hidden="true" data-code="f22d"></i> genderless</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-mars" data-name="mars" aria-hidden="true" data-code="f222"></i> mars</li>
+
+      <li data-addable="true"><i class="fa fa-mars-double" data-name="mars-double" aria-hidden="true" data-code="f227"></i> mars-double</li>
+
+      <li data-addable="true"><i class="fa fa-mars-stroke" data-name="mars-stroke" aria-hidden="true" data-code="f229"></i> mars-stroke</li>
+
+      <li data-addable="true"><i class="fa fa-mars-stroke-h" data-name="mars-stroke-h" aria-hidden="true" data-code="f22b"></i> mars-stroke-h</li>
+
+      <li data-addable="true"><i class="fa fa-mars-stroke-v" data-name="mars-stroke-v" aria-hidden="true" data-code="f22a"></i> mars-stroke-v</li>
+
+      <li data-addable="true"><i class="fa fa-mercury" data-name="mercury" aria-hidden="true" data-code="f223"></i> mercury</li>
+
+      <li data-addable="true"><i class="fa fa-neuter" data-name="neuter" aria-hidden="true" data-code="f22c"></i> neuter</li>
+
+      <li data-addable="true"><i class="fa fa-transgender" data-name="transgender" aria-hidden="true" data-code="f224"></i> transgender</li>
+
+      <li data-addable="true"><i class="fa fa-transgender-alt" data-name="transgender-alt" aria-hidden="true" data-code="f225"></i> transgender-alt</li>
+
+      <li data-addable="true"><i class="fa fa-venus" data-name="venus" aria-hidden="true" data-code="f221"></i> venus</li>
+
+      <li data-addable="true"><i class="fa fa-venus-double" data-name="venus-double" aria-hidden="true" data-code="f226"></i> venus-double</li>
+
+      <li data-addable="true"><i class="fa fa-venus-mars" data-name="venus-mars" aria-hidden="true" data-code="f228"></i> venus-mars</li>
+
+  </ul>
+
+</section>
+
+    <section id="file-type">
+  <h2 class="page-header">File Type Icons</h2>
+
+  <ul>
+
+
+
+      <li data-addable="true"><i class="fa fa-file" data-name="file" aria-hidden="true" data-code="f15b"></i> file</li>
+
+      <li data-addable="true"><i class="fa fa-file-archive-o" data-name="file-archive-o" aria-hidden="true" data-code="f1c6"></i> file-archive-o</li>
+
+      <li data-addable="true"><i class="fa fa-file-audio-o" data-name="file-audio-o" aria-hidden="true" data-code="f1c7"></i> file-audio-o</li>
+
+      <li data-addable="true"><i class="fa fa-file-code-o" data-name="file-code-o" aria-hidden="true" data-code="f1c9"></i> file-code-o</li>
+
+      <li data-addable="true"><i class="fa fa-file-excel-o" data-name="file-excel-o" aria-hidden="true" data-code="f1c3"></i> file-excel-o</li>
+
+      <li data-addable="true"><i class="fa fa-file-image-o" data-name="file-image-o" aria-hidden="true" data-code="f1c5"></i> file-image-o</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-file-o" data-name="file-o" aria-hidden="true" data-code="f016"></i> file-o</li>
+
+      <li data-addable="true"><i class="fa fa-file-pdf-o" data-name="file-pdf-o" aria-hidden="true" data-code="f1c1"></i> file-pdf-o</li>
+
+
+
+
+
+      <li data-addable="true"><i class="fa fa-file-powerpoint-o" data-name="file-powerpoint-o" aria-hidden="true" data-code="f1c4"></i> file-powerpoint-o</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-file-text" data-name="file-text" aria-hidden="true" data-code="f15c"></i> file-text</li>
+
+      <li data-addable="true"><i class="fa fa-file-text-o" data-name="file-text-o" aria-hidden="true" data-code="f0f6"></i> file-text-o</li>
+
+      <li data-addable="true"><i class="fa fa-file-video-o" data-name="file-video-o" aria-hidden="true" data-code="f1c8"></i> file-video-o</li>
+
+      <li data-addable="true"><i class="fa fa-file-word-o" data-name="file-word-o" aria-hidden="true" data-code="f1c2"></i> file-word-o</li>
+
+
+
+  </ul>
+
+</section>
+
+    <section id="spinner">
+  <h2 class="page-header">Spinner Icons</h2>
+
+  <ul>
+
+
+
+      <li data-addable="true"><i class="fa fa-circle-o-notch" data-name="circle-o-notch" aria-hidden="true" data-code="f1ce"></i> circle-o-notch</li>
+
+      <li data-addable="true"><i class="fa fa-cog" data-name="cog" aria-hidden="true" data-code="f013"></i> cog</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-refresh" data-name="refresh" aria-hidden="true" data-code="f021"></i> refresh</li>
+
+      <li data-addable="true"><i class="fa fa-spinner" data-name="spinner" aria-hidden="true" data-code="f110"></i> spinner</li>
+
+  </ul>
+</section>
+
+    <section id="form-control">
+  <h2 class="page-header">Form Control Icons</h2>
+
+  <ul>
+
+
+
+      <li data-addable="true"><i class="fa fa-check-square" data-name="check-square" aria-hidden="true" data-code="f14a"></i> check-square</li>
+
+      <li data-addable="true"><i class="fa fa-check-square-o" data-name="check-square-o" aria-hidden="true" data-code="f046"></i> check-square-o</li>
+
+      <li data-addable="true"><i class="fa fa-circle" data-name="circle" aria-hidden="true" data-code="f111"></i> circle</li>
+
+      <li data-addable="true"><i class="fa fa-circle-o" data-name="circle-o" aria-hidden="true" data-code="f10c"></i> circle-o</li>
+
+      <li data-addable="true"><i class="fa fa-dot-circle-o" data-name="dot-circle-o" aria-hidden="true" data-code="f192"></i> dot-circle-o</li>
+
+      <li data-addable="true"><i class="fa fa-minus-square" data-name="minus-square" aria-hidden="true" data-code="f146"></i> minus-square</li>
+
+      <li data-addable="true"><i class="fa fa-minus-square-o" data-name="minus-square-o" aria-hidden="true" data-code="f147"></i> minus-square-o</li>
+
+      <li data-addable="true"><i class="fa fa-plus-square" data-name="plus-square" aria-hidden="true" data-code="f0fe"></i> plus-square</li>
+
+      <li data-addable="true"><i class="fa fa-plus-square-o" data-name="plus-square-o" aria-hidden="true" data-code="f196"></i> plus-square-o</li>
+
+      <li data-addable="true"><i class="fa fa-square" data-name="square" aria-hidden="true" data-code="f0c8"></i> square</li>
+
+      <li data-addable="true"><i class="fa fa-square-o" data-name="square-o" aria-hidden="true" data-code="f096"></i> square-o</li>
+
+  </ul>
+</section>
+
+    <section id="payment">
+  <h2 class="page-header">Payment Icons</h2>
+
+  <ul>
+
+
+
+      <li data-addable="true"><i class="fa fa-cc-amex" data-name="cc-amex" aria-hidden="true" data-code="f1f3"></i> cc-amex</li>
+
+      <li data-addable="true"><i class="fa fa-cc-diners-club" data-name="cc-diners-club" aria-hidden="true" data-code="f24c"></i> cc-diners-club</li>
+
+      <li data-addable="true"><i class="fa fa-cc-discover" data-name="cc-discover" aria-hidden="true" data-code="f1f2"></i> cc-discover</li>
+
+      <li data-addable="true"><i class="fa fa-cc-jcb" data-name="cc-jcb" aria-hidden="true" data-code="f24b"></i> cc-jcb</li>
+
+      <li data-addable="true"><i class="fa fa-cc-mastercard" data-name="cc-mastercard" aria-hidden="true" data-code="f1f1"></i> cc-mastercard</li>
+
+      <li data-addable="true"><i class="fa fa-cc-paypal" data-name="cc-paypal" aria-hidden="true" data-code="f1f4"></i> cc-paypal</li>
+
+      <li data-addable="true"><i class="fa fa-cc-stripe" data-name="cc-stripe" aria-hidden="true" data-code="f1f5"></i> cc-stripe</li>
+
+      <li data-addable="true"><i class="fa fa-cc-visa" data-name="cc-visa" aria-hidden="true" data-code="f1f0"></i> cc-visa</li>
+
+      <li data-addable="true"><i class="fa fa-credit-card" data-name="credit-card" aria-hidden="true" data-code="f09d"></i> credit-card</li>
+
+      <li data-addable="true"><i class="fa fa-credit-card-alt" data-name="credit-card-alt" aria-hidden="true" data-code="f283"></i> credit-card-alt</li>
+
+      <li data-addable="true"><i class="fa fa-google-wallet" data-name="google-wallet" aria-hidden="true" data-code="f1ee"></i> google-wallet</li>
+
+      <li data-addable="true"><i class="fa fa-paypal" data-name="paypal" aria-hidden="true" data-code="f1ed"></i> paypal</li>
+
+  </ul>
+
+</section>
+
+    <section id="chart">
+  <h2 class="page-header">Chart Icons</h2>
+
+  <ul>
+
+
+
+      <li data-addable="true"><i class="fa fa-area-chart" data-name="area-chart" aria-hidden="true" data-code="f1fe"></i> area-chart</li>
+
+      <li data-addable="true"><i class="fa fa-bar-chart" data-name="bar-chart" aria-hidden="true" data-code="f080"></i> bar-chart</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-line-chart" data-name="line-chart" aria-hidden="true" data-code="f201"></i> line-chart</li>
+
+      <li data-addable="true"><i class="fa fa-pie-chart" data-name="pie-chart" aria-hidden="true" data-code="f200"></i> pie-chart</li>
+
+  </ul>
+
+</section>
+
+    <section id="currency">
+  <h2 class="page-header">Currency Icons</h2>
+
+  <ul>
+
+
+
+
+
+      <li data-addable="true"><i class="fa fa-btc" data-name="btc" aria-hidden="true" data-code="f15a"></i> btc</li>
+
+
+
+
+
+      <li data-addable="true"><i class="fa fa-eur" data-name="eur" aria-hidden="true" data-code="f153"></i> eur</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-gbp" data-name="gbp" aria-hidden="true" data-code="f154"></i> gbp</li>
+
+      <li data-addable="true"><i class="fa fa-gg" data-name="gg" aria-hidden="true" data-code="f260"></i> gg</li>
+
+      <li data-addable="true"><i class="fa fa-gg-circle" data-name="gg-circle" aria-hidden="true" data-code="f261"></i> gg-circle</li>
+
+      <li data-addable="true"><i class="fa fa-ils" data-name="ils" aria-hidden="true" data-code="f20b"></i> ils</li>
+
+      <li data-addable="true"><i class="fa fa-inr" data-name="inr" aria-hidden="true" data-code="f156"></i> inr</li>
+
+      <li data-addable="true"><i class="fa fa-jpy" data-name="jpy" aria-hidden="true" data-code="f157"></i> jpy</li>
+
+      <li data-addable="true"><i class="fa fa-krw" data-name="krw" aria-hidden="true" data-code="f159"></i> krw</li>
+
+      <li data-addable="true"><i class="fa fa-money" data-name="money" aria-hidden="true" data-code="f0d6"></i> money</li>
+
+
+
+
+
+      <li data-addable="true"><i class="fa fa-rub" data-name="rub" aria-hidden="true" data-code="f158"></i> rub</li>
+
+
+
+
+
+
+
+
+
+      <li data-addable="true"><i class="fa fa-try" data-name="try" aria-hidden="true" data-code="f195"></i> try</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-usd" data-name="usd" aria-hidden="true" data-code="f155"></i> usd</li>
+
+
+
+
+
+  </ul>
+
+</section>
+
+    <section id="text-editor">
+  <h2 class="page-header">Text Editor Icons</h2>
+
+  <ul>
+
+
+
+      <li data-addable="true"><i class="fa fa-align-center" data-name="align-center" aria-hidden="true" data-code="f037"></i> align-center</li>
+
+      <li data-addable="true"><i class="fa fa-align-justify" data-name="align-justify" aria-hidden="true" data-code="f039"></i> align-justify</li>
+
+      <li data-addable="true"><i class="fa fa-align-left" data-name="align-left" aria-hidden="true" data-code="f036"></i> align-left</li>
+
+      <li data-addable="true"><i class="fa fa-align-right" data-name="align-right" aria-hidden="true" data-code="f038"></i> align-right</li>
+
+      <li data-addable="true"><i class="fa fa-bold" data-name="bold" aria-hidden="true" data-code="f032"></i> bold</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-chain-broken" data-name="chain-broken" aria-hidden="true" data-code="f127"></i> chain-broken</li>
+
+      <li data-addable="true"><i class="fa fa-clipboard" data-name="clipboard" aria-hidden="true" data-code="f0ea"></i> clipboard</li>
+
+      <li data-addable="true"><i class="fa fa-columns" data-name="columns" aria-hidden="true" data-code="f0db"></i> columns</li>
+
+
+
+
+
+
+
+      <li data-addable="true"><i class="fa fa-eraser" data-name="eraser" aria-hidden="true" data-code="f12d"></i> eraser</li>
+
+      <li data-addable="true"><i class="fa fa-file" data-name="file" aria-hidden="true" data-code="f15b"></i> file</li>
+
+      <li data-addable="true"><i class="fa fa-file-o" data-name="file-o" aria-hidden="true" data-code="f016"></i> file-o</li>
+
+      <li data-addable="true"><i class="fa fa-file-text" data-name="file-text" aria-hidden="true" data-code="f15c"></i> file-text</li>
+
+      <li data-addable="true"><i class="fa fa-file-text-o" data-name="file-text-o" aria-hidden="true" data-code="f0f6"></i> file-text-o</li>
+
+      <li data-addable="true"><i class="fa fa-files-o" data-name="files-o" aria-hidden="true" data-code="f0c5"></i> files-o</li>
+
+      <li data-addable="true"><i class="fa fa-floppy-o" data-name="floppy-o" aria-hidden="true" data-code="f0c7"></i> floppy-o</li>
+
+      <li data-addable="true"><i class="fa fa-font" data-name="font" aria-hidden="true" data-code="f031"></i> font</li>
+
+      <li data-addable="true"><i class="fa fa-header" data-name="header" aria-hidden="true" data-code="f1dc"></i> header</li>
+
+      <li data-addable="true"><i class="fa fa-indent" data-name="indent" aria-hidden="true" data-code="f03c"></i> indent</li>
+
+      <li data-addable="true"><i class="fa fa-italic" data-name="italic" aria-hidden="true" data-code="f033"></i> italic</li>
+
+      <li data-addable="true"><i class="fa fa-link" data-name="link" aria-hidden="true" data-code="f0c1"></i> link</li>
+
+      <li data-addable="true"><i class="fa fa-list" data-name="list" aria-hidden="true" data-code="f03a"></i> list</li>
+
+      <li data-addable="true"><i class="fa fa-list-alt" data-name="list-alt" aria-hidden="true" data-code="f022"></i> list-alt</li>
+
+      <li data-addable="true"><i class="fa fa-list-ol" data-name="list-ol" aria-hidden="true" data-code="f0cb"></i> list-ol</li>
+
+      <li data-addable="true"><i class="fa fa-list-ul" data-name="list-ul" aria-hidden="true" data-code="f0ca"></i> list-ul</li>
+
+      <li data-addable="true"><i class="fa fa-outdent" data-name="outdent" aria-hidden="true" data-code="f03b"></i> outdent</li>
+
+      <li data-addable="true"><i class="fa fa-paperclip" data-name="paperclip" aria-hidden="true" data-code="f0c6"></i> paperclip</li>
+
+      <li data-addable="true"><i class="fa fa-paragraph" data-name="paragraph" aria-hidden="true" data-code="f1dd"></i> paragraph</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-repeat" data-name="repeat" aria-hidden="true" data-code="f01e"></i> repeat</li>
+
+
+
+
+
+
+
+      <li data-addable="true"><i class="fa fa-scissors" data-name="scissors" aria-hidden="true" data-code="f0c4"></i> scissors</li>
+
+      <li data-addable="true"><i class="fa fa-strikethrough" data-name="strikethrough" aria-hidden="true" data-code="f0cc"></i> strikethrough</li>
+
+      <li data-addable="true"><i class="fa fa-subscript" data-name="subscript" aria-hidden="true" data-code="f12c"></i> subscript</li>
+
+      <li data-addable="true"><i class="fa fa-superscript" data-name="superscript" aria-hidden="true" data-code="f12b"></i> superscript</li>
+
+      <li data-addable="true"><i class="fa fa-table" data-name="table" aria-hidden="true" data-code="f0ce"></i> table</li>
+
+      <li data-addable="true"><i class="fa fa-text-height" data-name="text-height" aria-hidden="true" data-code="f034"></i> text-height</li>
+
+      <li data-addable="true"><i class="fa fa-text-width" data-name="text-width" aria-hidden="true" data-code="f035"></i> text-width</li>
+
+      <li data-addable="true"><i class="fa fa-th" data-name="th" aria-hidden="true" data-code="f00a"></i> th</li>
+
+      <li data-addable="true"><i class="fa fa-th-large" data-name="th-large" aria-hidden="true" data-code="f009"></i> th-large</li>
+
+      <li data-addable="true"><i class="fa fa-th-list" data-name="th-list" aria-hidden="true" data-code="f00b"></i> th-list</li>
+
+      <li data-addable="true"><i class="fa fa-underline" data-name="underline" aria-hidden="true" data-code="f0cd"></i> underline</li>
+
+      <li data-addable="true"><i class="fa fa-undo" data-name="undo" aria-hidden="true" data-code="f0e2"></i> undo</li>
+
+
+
+  </ul>
+
+</section>
+
+    <section id="directional">
+  <h2 class="page-header">Directional Icons</h2>
+
+  <ul>
+
+
+
+      <li data-addable="true"><i class="fa fa-angle-double-down" data-name="angle-double-down" aria-hidden="true" data-code="f103"></i> angle-double-down</li>
+
+      <li data-addable="true"><i class="fa fa-angle-double-left" data-name="angle-double-left" aria-hidden="true" data-code="f100"></i> angle-double-left</li>
+
+      <li data-addable="true"><i class="fa fa-angle-double-right" data-name="angle-double-right" aria-hidden="true" data-code="f101"></i> angle-double-right</li>
+
+      <li data-addable="true"><i class="fa fa-angle-double-up" data-name="angle-double-up" aria-hidden="true" data-code="f102"></i> angle-double-up</li>
+
+      <li data-addable="true"><i class="fa fa-angle-down" data-name="angle-down" aria-hidden="true" data-code="f107"></i> angle-down</li>
+
+      <li data-addable="true"><i class="fa fa-angle-left" data-name="angle-left" aria-hidden="true" data-code="f104"></i> angle-left</li>
+
+      <li data-addable="true"><i class="fa fa-angle-right" data-name="angle-right" aria-hidden="true" data-code="f105"></i> angle-right</li>
+
+      <li data-addable="true"><i class="fa fa-angle-up" data-name="angle-up" aria-hidden="true" data-code="f106"></i> angle-up</li>
+
+      <li data-addable="true"><i class="fa fa-arrow-circle-down" data-name="arrow-circle-down" aria-hidden="true" data-code="f0ab"></i> arrow-circle-down</li>
+
+      <li data-addable="true"><i class="fa fa-arrow-circle-left" data-name="arrow-circle-left" aria-hidden="true" data-code="f0a8"></i> arrow-circle-left</li>
+
+      <li data-addable="true"><i class="fa fa-arrow-circle-o-down" data-name="arrow-circle-o-down" aria-hidden="true" data-code="f01a"></i> arrow-circle-o-down</li>
+
+      <li data-addable="true"><i class="fa fa-arrow-circle-o-left" data-name="arrow-circle-o-left" aria-hidden="true" data-code="f190"></i> arrow-circle-o-left</li>
+
+      <li data-addable="true"><i class="fa fa-arrow-circle-o-right" data-name="arrow-circle-o-right" aria-hidden="true" data-code="f18e"></i> arrow-circle-o-right</li>
+
+      <li data-addable="true"><i class="fa fa-arrow-circle-o-up" data-name="arrow-circle-o-up" aria-hidden="true" data-code="f01b"></i> arrow-circle-o-up</li>
+
+      <li data-addable="true"><i class="fa fa-arrow-circle-right" data-name="arrow-circle-right" aria-hidden="true" data-code="f0a9"></i> arrow-circle-right</li>
+
+      <li data-addable="true"><i class="fa fa-arrow-circle-up" data-name="arrow-circle-up" aria-hidden="true" data-code="f0aa"></i> arrow-circle-up</li>
+
+      <li data-addable="true"><i class="fa fa-arrow-down" data-name="arrow-down" aria-hidden="true" data-code="f063"></i> arrow-down</li>
+
+      <li data-addable="true"><i class="fa fa-arrow-left" data-name="arrow-left" aria-hidden="true" data-code="f060"></i> arrow-left</li>
+
+      <li data-addable="true"><i class="fa fa-arrow-right" data-name="arrow-right" aria-hidden="true" data-code="f061"></i> arrow-right</li>
+
+      <li data-addable="true"><i class="fa fa-arrow-up" data-name="arrow-up" aria-hidden="true" data-code="f062"></i> arrow-up</li>
+
+      <li data-addable="true"><i class="fa fa-arrows" data-name="arrows" aria-hidden="true" data-code="f047"></i> arrows</li>
+
+      <li data-addable="true"><i class="fa fa-arrows-alt" data-name="arrows-alt" aria-hidden="true" data-code="f0b2"></i> arrows-alt</li>
+
+      <li data-addable="true"><i class="fa fa-arrows-h" data-name="arrows-h" aria-hidden="true" data-code="f07e"></i> arrows-h</li>
+
+      <li data-addable="true"><i class="fa fa-arrows-v" data-name="arrows-v" aria-hidden="true" data-code="f07d"></i> arrows-v</li>
+
+      <li data-addable="true"><i class="fa fa-caret-down" data-name="caret-down" aria-hidden="true" data-code="f0d7"></i> caret-down</li>
+
+      <li data-addable="true"><i class="fa fa-caret-left" data-name="caret-left" aria-hidden="true" data-code="f0d9"></i> caret-left</li>
+
+      <li data-addable="true"><i class="fa fa-caret-right" data-name="caret-right" aria-hidden="true" data-code="f0da"></i> caret-right</li>
+
+      <li data-addable="true"><i class="fa fa-caret-square-o-down" data-name="caret-square-o-down" aria-hidden="true" data-code="f150"></i> caret-square-o-down</li>
+
+      <li data-addable="true"><i class="fa fa-caret-square-o-left" data-name="caret-square-o-left" aria-hidden="true" data-code="f191"></i> caret-square-o-left</li>
+
+      <li data-addable="true"><i class="fa fa-caret-square-o-right" data-name="caret-square-o-right" aria-hidden="true" data-code="f152"></i> caret-square-o-right</li>
+
+      <li data-addable="true"><i class="fa fa-caret-square-o-up" data-name="caret-square-o-up" aria-hidden="true" data-code="f151"></i> caret-square-o-up</li>
+
+      <li data-addable="true"><i class="fa fa-caret-up" data-name="caret-up" aria-hidden="true" data-code="f0d8"></i> caret-up</li>
+
+      <li data-addable="true"><i class="fa fa-chevron-circle-down" data-name="chevron-circle-down" aria-hidden="true" data-code="f13a"></i> chevron-circle-down</li>
+
+      <li data-addable="true"><i class="fa fa-chevron-circle-left" data-name="chevron-circle-left" aria-hidden="true" data-code="f137"></i> chevron-circle-left</li>
+
+      <li data-addable="true"><i class="fa fa-chevron-circle-right" data-name="chevron-circle-right" aria-hidden="true" data-code="f138"></i> chevron-circle-right</li>
+
+      <li data-addable="true"><i class="fa fa-chevron-circle-up" data-name="chevron-circle-up" aria-hidden="true" data-code="f139"></i> chevron-circle-up</li>
+
+      <li data-addable="true"><i class="fa fa-chevron-down" data-name="chevron-down" aria-hidden="true" data-code="f078"></i> chevron-down</li>
+
+      <li data-addable="true"><i class="fa fa-chevron-left" data-name="chevron-left" aria-hidden="true" data-code="f053"></i> chevron-left</li>
+
+      <li data-addable="true"><i class="fa fa-chevron-right" data-name="chevron-right" aria-hidden="true" data-code="f054"></i> chevron-right</li>
+
+      <li data-addable="true"><i class="fa fa-chevron-up" data-name="chevron-up" aria-hidden="true" data-code="f077"></i> chevron-up</li>
+
+      <li data-addable="true"><i class="fa fa-exchange" data-name="exchange" aria-hidden="true" data-code="f0ec"></i> exchange</li>
+
+      <li data-addable="true"><i class="fa fa-hand-o-down" data-name="hand-o-down" aria-hidden="true" data-code="f0a7"></i> hand-o-down</li>
+
+      <li data-addable="true"><i class="fa fa-hand-o-left" data-name="hand-o-left" aria-hidden="true" data-code="f0a5"></i> hand-o-left</li>
+
+      <li data-addable="true"><i class="fa fa-hand-o-right" data-name="hand-o-right" aria-hidden="true" data-code="f0a4"></i> hand-o-right</li>
+
+      <li data-addable="true"><i class="fa fa-hand-o-up" data-name="hand-o-up" aria-hidden="true" data-code="f0a6"></i> hand-o-up</li>
+
+      <li data-addable="true"><i class="fa fa-long-arrow-down" data-name="long-arrow-down" aria-hidden="true" data-code="f175"></i> long-arrow-down</li>
+
+      <li data-addable="true"><i class="fa fa-long-arrow-left" data-name="long-arrow-left" aria-hidden="true" data-code="f177"></i> long-arrow-left</li>
+
+      <li data-addable="true"><i class="fa fa-long-arrow-right" data-name="long-arrow-right" aria-hidden="true" data-code="f178"></i> long-arrow-right</li>
+
+      <li data-addable="true"><i class="fa fa-long-arrow-up" data-name="long-arrow-up" aria-hidden="true" data-code="f176"></i> long-arrow-up</li>
+
+
+
+
+
+
+
+
+
+  </ul>
+
+</section>
+
+    <section id="video-player">
+  <h2 class="page-header">Video Player Icons</h2>
+
+  <ul>
+
+
+
+      <li data-addable="true"><i class="fa fa-arrows-alt" data-name="arrows-alt" aria-hidden="true" data-code="f0b2"></i> arrows-alt</li>
+
+      <li data-addable="true"><i class="fa fa-backward" data-name="backward" aria-hidden="true" data-code="f04a"></i> backward</li>
+
+      <li data-addable="true"><i class="fa fa-compress" data-name="compress" aria-hidden="true" data-code="f066"></i> compress</li>
+
+      <li data-addable="true"><i class="fa fa-eject" data-name="eject" aria-hidden="true" data-code="f052"></i> eject</li>
+
+      <li data-addable="true"><i class="fa fa-expand" data-name="expand" aria-hidden="true" data-code="f065"></i> expand</li>
+
+      <li data-addable="true"><i class="fa fa-fast-backward" data-name="fast-backward" aria-hidden="true" data-code="f049"></i> fast-backward</li>
+
+      <li data-addable="true"><i class="fa fa-fast-forward" data-name="fast-forward" aria-hidden="true" data-code="f050"></i> fast-forward</li>
+
+      <li data-addable="true"><i class="fa fa-forward" data-name="forward" aria-hidden="true" data-code="f04e"></i> forward</li>
+
+      <li data-addable="true"><i class="fa fa-pause" data-name="pause" aria-hidden="true" data-code="f04c"></i> pause</li>
+
+      <li data-addable="true"><i class="fa fa-pause-circle" data-name="pause-circle" aria-hidden="true" data-code="f28b"></i> pause-circle</li>
+
+      <li data-addable="true"><i class="fa fa-pause-circle-o" data-name="pause-circle-o" aria-hidden="true" data-code="f28c"></i> pause-circle-o</li>
+
+      <li data-addable="true"><i class="fa fa-play" data-name="play" aria-hidden="true" data-code="f04b"></i> play</li>
+
+      <li data-addable="true"><i class="fa fa-play-circle" data-name="play-circle" aria-hidden="true" data-code="f144"></i> play-circle</li>
+
+      <li data-addable="true"><i class="fa fa-play-circle-o" data-name="play-circle-o" aria-hidden="true" data-code="f01d"></i> play-circle-o</li>
+
+      <li data-addable="true"><i class="fa fa-random" data-name="random" aria-hidden="true" data-code="f074"></i> random</li>
+
+      <li data-addable="true"><i class="fa fa-step-backward" data-name="step-backward" aria-hidden="true" data-code="f048"></i> step-backward</li>
+
+      <li data-addable="true"><i class="fa fa-step-forward" data-name="step-forward" aria-hidden="true" data-code="f051"></i> step-forward</li>
+
+      <li data-addable="true"><i class="fa fa-stop" data-name="stop" aria-hidden="true" data-code="f04d"></i> stop</li>
+
+      <li data-addable="true"><i class="fa fa-stop-circle" data-name="stop-circle" aria-hidden="true" data-code="f28d"></i> stop-circle</li>
+
+      <li data-addable="true"><i class="fa fa-stop-circle-o" data-name="stop-circle-o" aria-hidden="true" data-code="f28e"></i> stop-circle-o</li>
+
+      <li data-addable="true"><i class="fa fa-youtube-play" data-name="youtube-play" aria-hidden="true" data-code="f16a"></i> youtube-play</li>
+
+  </ul>
+
+</section>
+
+    <section id="brand">
+  <h2 class="page-header">Brand Icons</h2>
+
+  <ul>
+
+
+
+      <li data-addable="true"><i class="fa fa-500px" data-name="500px" aria-hidden="true" data-code="f26e"></i> 500px</li>
+
+      <li data-addable="true"><i class="fa fa-adn" data-name="adn" aria-hidden="true" data-code="f170"></i> adn</li>
+
+      <li data-addable="true"><i class="fa fa-amazon" data-name="amazon" aria-hidden="true" data-code="f270"></i> amazon</li>
+
+      <li data-addable="true"><i class="fa fa-android" data-name="android" aria-hidden="true" data-code="f17b"></i> android</li>
+
+      <li data-addable="true"><i class="fa fa-angellist" data-name="angellist" aria-hidden="true" data-code="f209"></i> angellist</li>
+
+      <li data-addable="true"><i class="fa fa-apple" data-name="apple" aria-hidden="true" data-code="f179"></i> apple</li>
+
+      <li data-addable="true"><i class="fa fa-bandcamp" data-name="bandcamp" aria-hidden="true" data-code="f2d5"></i> bandcamp</li>
+
+      <li data-addable="true"><i class="fa fa-behance" data-name="behance" aria-hidden="true" data-code="f1b4"></i> behance</li>
+
+      <li data-addable="true"><i class="fa fa-behance-square" data-name="behance-square" aria-hidden="true" data-code="f1b5"></i> behance-square</li>
+
+      <li data-addable="true"><i class="fa fa-bitbucket" data-name="bitbucket" aria-hidden="true" data-code="f171"></i> bitbucket</li>
+
+      <li data-addable="true"><i class="fa fa-bitbucket-square" data-name="bitbucket-square" aria-hidden="true" data-code="f172"></i> bitbucket-square</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-black-tie" data-name="black-tie" aria-hidden="true" data-code="f27e"></i> black-tie</li>
+
+      <li data-addable="true"><i class="fa fa-bluetooth" data-name="bluetooth" aria-hidden="true" data-code="f293"></i> bluetooth</li>
+
+      <li data-addable="true"><i class="fa fa-bluetooth-b" data-name="bluetooth-b" aria-hidden="true" data-code="f294"></i> bluetooth-b</li>
+
+      <li data-addable="true"><i class="fa fa-btc" data-name="btc" aria-hidden="true" data-code="f15a"></i> btc</li>
+
+      <li data-addable="true"><i class="fa fa-buysellads" data-name="buysellads" aria-hidden="true" data-code="f20d"></i> buysellads</li>
+
+      <li data-addable="true"><i class="fa fa-cc-amex" data-name="cc-amex" aria-hidden="true" data-code="f1f3"></i> cc-amex</li>
+
+      <li data-addable="true"><i class="fa fa-cc-diners-club" data-name="cc-diners-club" aria-hidden="true" data-code="f24c"></i> cc-diners-club</li>
+
+      <li data-addable="true"><i class="fa fa-cc-discover" data-name="cc-discover" aria-hidden="true" data-code="f1f2"></i> cc-discover</li>
+
+      <li data-addable="true"><i class="fa fa-cc-jcb" data-name="cc-jcb" aria-hidden="true" data-code="f24b"></i> cc-jcb</li>
+
+      <li data-addable="true"><i class="fa fa-cc-mastercard" data-name="cc-mastercard" aria-hidden="true" data-code="f1f1"></i> cc-mastercard</li>
+
+      <li data-addable="true"><i class="fa fa-cc-paypal" data-name="cc-paypal" aria-hidden="true" data-code="f1f4"></i> cc-paypal</li>
+
+      <li data-addable="true"><i class="fa fa-cc-stripe" data-name="cc-stripe" aria-hidden="true" data-code="f1f5"></i> cc-stripe</li>
+
+      <li data-addable="true"><i class="fa fa-cc-visa" data-name="cc-visa" aria-hidden="true" data-code="f1f0"></i> cc-visa</li>
+
+      <li data-addable="true"><i class="fa fa-chrome" data-name="chrome" aria-hidden="true" data-code="f268"></i> chrome</li>
+
+      <li data-addable="true"><i class="fa fa-codepen" data-name="codepen" aria-hidden="true" data-code="f1cb"></i> codepen</li>
+
+      <li data-addable="true"><i class="fa fa-codiepie" data-name="codiepie" aria-hidden="true" data-code="f284"></i> codiepie</li>
+
+      <li data-addable="true"><i class="fa fa-connectdevelop" data-name="connectdevelop" aria-hidden="true" data-code="f20e"></i> connectdevelop</li>
+
+      <li data-addable="true"><i class="fa fa-contao" data-name="contao" aria-hidden="true" data-code="f26d"></i> contao</li>
+
+      <li data-addable="true"><i class="fa fa-css3" data-name="css3" aria-hidden="true" data-code="f13c"></i> css3</li>
+
+      <li data-addable="true"><i class="fa fa-dashcube" data-name="dashcube" aria-hidden="true" data-code="f210"></i> dashcube</li>
+
+      <li data-addable="true"><i class="fa fa-delicious" data-name="delicious" aria-hidden="true" data-code="f1a5"></i> delicious</li>
+
+      <li data-addable="true"><i class="fa fa-deviantart" data-name="deviantart" aria-hidden="true" data-code="f1bd"></i> deviantart</li>
+
+      <li data-addable="true"><i class="fa fa-digg" data-name="digg" aria-hidden="true" data-code="f1a6"></i> digg</li>
+
+      <li data-addable="true"><i class="fa fa-dribbble" data-name="dribbble" aria-hidden="true" data-code="f17d"></i> dribbble</li>
+
+      <li data-addable="true"><i class="fa fa-dropbox" data-name="dropbox" aria-hidden="true" data-code="f16b"></i> dropbox</li>
+
+      <li data-addable="true"><i class="fa fa-drupal" data-name="drupal" aria-hidden="true" data-code="f1a9"></i> drupal</li>
+
+      <li data-addable="true"><i class="fa fa-edge" data-name="edge" aria-hidden="true" data-code="f282"></i> edge</li>
+
+      <li data-addable="true"><i class="fa fa-eercast" data-name="eercast" aria-hidden="true" data-code="f2da"></i> eercast</li>
+
+      <li data-addable="true"><i class="fa fa-empire" data-name="empire" aria-hidden="true" data-code="f1d1"></i> empire</li>
+
+      <li data-addable="true"><i class="fa fa-envira" data-name="envira" aria-hidden="true" data-code="f299"></i> envira</li>
+
+      <li data-addable="true"><i class="fa fa-etsy" data-name="etsy" aria-hidden="true" data-code="f2d7"></i> etsy</li>
+
+      <li data-addable="true"><i class="fa fa-expeditedssl" data-name="expeditedssl" aria-hidden="true" data-code="f23e"></i> expeditedssl</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-facebook" data-name="facebook" aria-hidden="true" data-code="f09a"></i> facebook</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-facebook-official" data-name="facebook-official" aria-hidden="true" data-code="f230"></i> facebook-official</li>
+
+      <li data-addable="true"><i class="fa fa-facebook-square" data-name="facebook-square" aria-hidden="true" data-code="f082"></i> facebook-square</li>
+
+      <li data-addable="true"><i class="fa fa-firefox" data-name="firefox" aria-hidden="true" data-code="f269"></i> firefox</li>
+
+      <li data-addable="true"><i class="fa fa-first-order" data-name="first-order" aria-hidden="true" data-code="f2b0"></i> first-order</li>
+
+      <li data-addable="true"><i class="fa fa-flickr" data-name="flickr" aria-hidden="true" data-code="f16e"></i> flickr</li>
+
+      <li data-addable="true"><i class="fa fa-font-awesome" data-name="font-awesome" aria-hidden="true" data-code="f2b4"></i> font-awesome</li>
+
+      <li data-addable="true"><i class="fa fa-fonticons" data-name="fonticons" aria-hidden="true" data-code="f280"></i> fonticons</li>
+
+      <li data-addable="true"><i class="fa fa-fort-awesome" data-name="fort-awesome" aria-hidden="true" data-code="f286"></i> fort-awesome</li>
+
+      <li data-addable="true"><i class="fa fa-forumbee" data-name="forumbee" aria-hidden="true" data-code="f211"></i> forumbee</li>
+
+      <li data-addable="true"><i class="fa fa-foursquare" data-name="foursquare" aria-hidden="true" data-code="f180"></i> foursquare</li>
+
+      <li data-addable="true"><i class="fa fa-free-code-camp" data-name="free-code-camp" aria-hidden="true" data-code="f2c5"></i> free-code-camp</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-get-pocket" data-name="get-pocket" aria-hidden="true" data-code="f265"></i> get-pocket</li>
+
+      <li data-addable="true"><i class="fa fa-gg" data-name="gg" aria-hidden="true" data-code="f260"></i> gg</li>
+
+      <li data-addable="true"><i class="fa fa-gg-circle" data-name="gg-circle" aria-hidden="true" data-code="f261"></i> gg-circle</li>
+
+      <li data-addable="true"><i class="fa fa-git" data-name="git" aria-hidden="true" data-code="f1d3"></i> git</li>
+
+      <li data-addable="true"><i class="fa fa-git-square" data-name="git-square" aria-hidden="true" data-code="f1d2"></i> git-square</li>
+
+      <li data-addable="true"><i class="fa fa-github" data-name="github" aria-hidden="true" data-code="f09b"></i> github</li>
+
+      <li data-addable="true"><i class="fa fa-github-alt" data-name="github-alt" aria-hidden="true" data-code="f113"></i> github-alt</li>
+
+      <li data-addable="true"><i class="fa fa-github-square" data-name="github-square" aria-hidden="true" data-code="f092"></i> github-square</li>
+
+      <li data-addable="true"><i class="fa fa-gitlab" data-name="gitlab" aria-hidden="true" data-code="f296"></i> gitlab</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-glide" data-name="glide" aria-hidden="true" data-code="f2a5"></i> glide</li>
+
+      <li data-addable="true"><i class="fa fa-glide-g" data-name="glide-g" aria-hidden="true" data-code="f2a6"></i> glide-g</li>
+
+      <li data-addable="true"><i class="fa fa-google" data-name="google" aria-hidden="true" data-code="f1a0"></i> google</li>
+
+      <li data-addable="true"><i class="fa fa-google-plus" data-name="google-plus" aria-hidden="true" data-code="f0d5"></i> google-plus</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-google-plus-official" data-name="google-plus-official" aria-hidden="true" data-code="f2b3"></i> google-plus-official</li>
+
+      <li data-addable="true"><i class="fa fa-google-plus-square" data-name="google-plus-square" aria-hidden="true" data-code="f0d4"></i> google-plus-square</li>
+
+      <li data-addable="true"><i class="fa fa-google-wallet" data-name="google-wallet" aria-hidden="true" data-code="f1ee"></i> google-wallet</li>
+
+      <li data-addable="true"><i class="fa fa-gratipay" data-name="gratipay" aria-hidden="true" data-code="f184"></i> gratipay</li>
+
+      <li data-addable="true"><i class="fa fa-grav" data-name="grav" aria-hidden="true" data-code="f2d6"></i> grav</li>
+
+      <li data-addable="true"><i class="fa fa-hacker-news" data-name="hacker-news" aria-hidden="true" data-code="f1d4"></i> hacker-news</li>
+
+      <li data-addable="true"><i class="fa fa-houzz" data-name="houzz" aria-hidden="true" data-code="f27c"></i> houzz</li>
+
+      <li data-addable="true"><i class="fa fa-html5" data-name="html5" aria-hidden="true" data-code="f13b"></i> html5</li>
+
+      <li data-addable="true"><i class="fa fa-imdb" data-name="imdb" aria-hidden="true" data-code="f2d8"></i> imdb</li>
+
+      <li data-addable="true"><i class="fa fa-instagram" data-name="instagram" aria-hidden="true" data-code="f16d"></i> instagram</li>
+
+      <li data-addable="true"><i class="fa fa-internet-explorer" data-name="internet-explorer" aria-hidden="true" data-code="f26b"></i> internet-explorer</li>
+
+      <li data-addable="true"><i class="fa fa-ioxhost" data-name="ioxhost" aria-hidden="true" data-code="f208"></i> ioxhost</li>
+
+      <li data-addable="true"><i class="fa fa-joomla" data-name="joomla" aria-hidden="true" data-code="f1aa"></i> joomla</li>
+
+      <li data-addable="true"><i class="fa fa-jsfiddle" data-name="jsfiddle" aria-hidden="true" data-code="f1cc"></i> jsfiddle</li>
+
+      <li data-addable="true"><i class="fa fa-lastfm" data-name="lastfm" aria-hidden="true" data-code="f202"></i> lastfm</li>
+
+      <li data-addable="true"><i class="fa fa-lastfm-square" data-name="lastfm-square" aria-hidden="true" data-code="f203"></i> lastfm-square</li>
+
+      <li data-addable="true"><i class="fa fa-leanpub" data-name="leanpub" aria-hidden="true" data-code="f212"></i> leanpub</li>
+
+      <li data-addable="true"><i class="fa fa-linkedin" data-name="linkedin" aria-hidden="true" data-code="f0e1"></i> linkedin</li>
+
+      <li data-addable="true"><i class="fa fa-linkedin-square" data-name="linkedin-square" aria-hidden="true" data-code="f08c"></i> linkedin-square</li>
+
+      <li data-addable="true"><i class="fa fa-linode" data-name="linode" aria-hidden="true" data-code="f2b8"></i> linode</li>
+
+      <li data-addable="true"><i class="fa fa-linux" data-name="linux" aria-hidden="true" data-code="f17c"></i> linux</li>
+
+      <li data-addable="true"><i class="fa fa-maxcdn" data-name="maxcdn" aria-hidden="true" data-code="f136"></i> maxcdn</li>
+
+      <li data-addable="true"><i class="fa fa-meanpath" data-name="meanpath" aria-hidden="true" data-code="f20c"></i> meanpath</li>
+
+      <li data-addable="true"><i class="fa fa-medium" data-name="medium" aria-hidden="true" data-code="f23a"></i> medium</li>
+
+      <li data-addable="true"><i class="fa fa-meetup" data-name="meetup" aria-hidden="true" data-code="f2e0"></i> meetup</li>
+
+      <li data-addable="true"><i class="fa fa-mixcloud" data-name="mixcloud" aria-hidden="true" data-code="f289"></i> mixcloud</li>
+
+      <li data-addable="true"><i class="fa fa-modx" data-name="modx" aria-hidden="true" data-code="f285"></i> modx</li>
+
+      <li data-addable="true"><i class="fa fa-odnoklassniki" data-name="odnoklassniki" aria-hidden="true" data-code="f263"></i> odnoklassniki</li>
+
+      <li data-addable="true"><i class="fa fa-odnoklassniki-square" data-name="odnoklassniki-square" aria-hidden="true" data-code="f264"></i> odnoklassniki-square</li>
+
+      <li data-addable="true"><i class="fa fa-opencart" data-name="opencart" aria-hidden="true" data-code="f23d"></i> opencart</li>
+
+      <li data-addable="true"><i class="fa fa-openid" data-name="openid" aria-hidden="true" data-code="f19b"></i> openid</li>
+
+      <li data-addable="true"><i class="fa fa-opera" data-name="opera" aria-hidden="true" data-code="f26a"></i> opera</li>
+
+      <li data-addable="true"><i class="fa fa-optin-monster" data-name="optin-monster" aria-hidden="true" data-code="f23c"></i> optin-monster</li>
+
+      <li data-addable="true"><i class="fa fa-pagelines" data-name="pagelines" aria-hidden="true" data-code="f18c"></i> pagelines</li>
+
+      <li data-addable="true"><i class="fa fa-paypal" data-name="paypal" aria-hidden="true" data-code="f1ed"></i> paypal</li>
+
+      <li data-addable="true"><i class="fa fa-pied-piper" data-name="pied-piper" aria-hidden="true" data-code="f2ae"></i> pied-piper</li>
+
+      <li data-addable="true"><i class="fa fa-pied-piper-alt" data-name="pied-piper-alt" aria-hidden="true" data-code="f1a8"></i> pied-piper-alt</li>
+
+      <li data-addable="true"><i class="fa fa-pied-piper-pp" data-name="pied-piper-pp" aria-hidden="true" data-code="f1a7"></i> pied-piper-pp</li>
+
+      <li data-addable="true"><i class="fa fa-pinterest" data-name="pinterest" aria-hidden="true" data-code="f0d2"></i> pinterest</li>
+
+      <li data-addable="true"><i class="fa fa-pinterest-p" data-name="pinterest-p" aria-hidden="true" data-code="f231"></i> pinterest-p</li>
+
+      <li data-addable="true"><i class="fa fa-pinterest-square" data-name="pinterest-square" aria-hidden="true" data-code="f0d3"></i> pinterest-square</li>
+
+      <li data-addable="true"><i class="fa fa-product-hunt" data-name="product-hunt" aria-hidden="true" data-code="f288"></i> product-hunt</li>
+
+      <li data-addable="true"><i class="fa fa-qq" data-name="qq" aria-hidden="true" data-code="f1d6"></i> qq</li>
+
+      <li data-addable="true"><i class="fa fa-quora" data-name="quora" aria-hidden="true" data-code="f2c4"></i> quora</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-ravelry" data-name="ravelry" aria-hidden="true" data-code="f2d9"></i> ravelry</li>
+
+      <li data-addable="true"><i class="fa fa-rebel" data-name="rebel" aria-hidden="true" data-code="f1d0"></i> rebel</li>
+
+      <li data-addable="true"><i class="fa fa-reddit" data-name="reddit" aria-hidden="true" data-code="f1a1"></i> reddit</li>
+
+      <li data-addable="true"><i class="fa fa-reddit-alien" data-name="reddit-alien" aria-hidden="true" data-code="f281"></i> reddit-alien</li>
+
+      <li data-addable="true"><i class="fa fa-reddit-square" data-name="reddit-square" aria-hidden="true" data-code="f1a2"></i> reddit-square</li>
+
+      <li data-addable="true"><i class="fa fa-renren" data-name="renren" aria-hidden="true" data-code="f18b"></i> renren</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-safari" data-name="safari" aria-hidden="true" data-code="f267"></i> safari</li>
+
+      <li data-addable="true"><i class="fa fa-scribd" data-name="scribd" aria-hidden="true" data-code="f28a"></i> scribd</li>
+
+      <li data-addable="true"><i class="fa fa-sellsy" data-name="sellsy" aria-hidden="true" data-code="f213"></i> sellsy</li>
+
+      <li data-addable="true"><i class="fa fa-share-alt" data-name="share-alt" aria-hidden="true" data-code="f1e0"></i> share-alt</li>
+
+      <li data-addable="true"><i class="fa fa-share-alt-square" data-name="share-alt-square" aria-hidden="true" data-code="f1e1"></i> share-alt-square</li>
+
+      <li data-addable="true"><i class="fa fa-shirtsinbulk" data-name="shirtsinbulk" aria-hidden="true" data-code="f214"></i> shirtsinbulk</li>
+
+      <li data-addable="true"><i class="fa fa-simplybuilt" data-name="simplybuilt" aria-hidden="true" data-code="f215"></i> simplybuilt</li>
+
+      <li data-addable="true"><i class="fa fa-skyatlas" data-name="skyatlas" aria-hidden="true" data-code="f216"></i> skyatlas</li>
+
+      <li data-addable="true"><i class="fa fa-skype" data-name="skype" aria-hidden="true" data-code="f17e"></i> skype</li>
+
+      <li data-addable="true"><i class="fa fa-slack" data-name="slack" aria-hidden="true" data-code="f198"></i> slack</li>
+
+      <li data-addable="true"><i class="fa fa-slideshare" data-name="slideshare" aria-hidden="true" data-code="f1e7"></i> slideshare</li>
+
+      <li data-addable="true"><i class="fa fa-snapchat" data-name="snapchat" aria-hidden="true" data-code="f2ab"></i> snapchat</li>
+
+      <li data-addable="true"><i class="fa fa-snapchat-ghost" data-name="snapchat-ghost" aria-hidden="true" data-code="f2ac"></i> snapchat-ghost</li>
+
+      <li data-addable="true"><i class="fa fa-snapchat-square" data-name="snapchat-square" aria-hidden="true" data-code="f2ad"></i> snapchat-square</li>
+
+      <li data-addable="true"><i class="fa fa-soundcloud" data-name="soundcloud" aria-hidden="true" data-code="f1be"></i> soundcloud</li>
+
+      <li data-addable="true"><i class="fa fa-spotify" data-name="spotify" aria-hidden="true" data-code="f1bc"></i> spotify</li>
+
+      <li data-addable="true"><i class="fa fa-stack-exchange" data-name="stack-exchange" aria-hidden="true" data-code="f18d"></i> stack-exchange</li>
+
+      <li data-addable="true"><i class="fa fa-stack-overflow" data-name="stack-overflow" aria-hidden="true" data-code="f16c"></i> stack-overflow</li>
+
+      <li data-addable="true"><i class="fa fa-steam" data-name="steam" aria-hidden="true" data-code="f1b6"></i> steam</li>
+
+      <li data-addable="true"><i class="fa fa-steam-square" data-name="steam-square" aria-hidden="true" data-code="f1b7"></i> steam-square</li>
+
+      <li data-addable="true"><i class="fa fa-stumbleupon" data-name="stumbleupon" aria-hidden="true" data-code="f1a4"></i> stumbleupon</li>
+
+      <li data-addable="true"><i class="fa fa-stumbleupon-circle" data-name="stumbleupon-circle" aria-hidden="true" data-code="f1a3"></i> stumbleupon-circle</li>
+
+      <li data-addable="true"><i class="fa fa-superpowers" data-name="superpowers" aria-hidden="true" data-code="f2dd"></i> superpowers</li>
+
+      <li data-addable="true"><i class="fa fa-telegram" data-name="telegram" aria-hidden="true" data-code="f2c6"></i> telegram</li>
+
+      <li data-addable="true"><i class="fa fa-tencent-weibo" data-name="tencent-weibo" aria-hidden="true" data-code="f1d5"></i> tencent-weibo</li>
+
+      <li data-addable="true"><i class="fa fa-themeisle" data-name="themeisle" aria-hidden="true" data-code="f2b2"></i> themeisle</li>
+
+      <li data-addable="true"><i class="fa fa-trello" data-name="trello" aria-hidden="true" data-code="f181"></i> trello</li>
+
+      <li data-addable="true"><i class="fa fa-tripadvisor" data-name="tripadvisor" aria-hidden="true" data-code="f262"></i> tripadvisor</li>
+
+      <li data-addable="true"><i class="fa fa-tumblr" data-name="tumblr" aria-hidden="true" data-code="f173"></i> tumblr</li>
+
+      <li data-addable="true"><i class="fa fa-tumblr-square" data-name="tumblr-square" aria-hidden="true" data-code="f174"></i> tumblr-square</li>
+
+      <li data-addable="true"><i class="fa fa-twitch" data-name="twitch" aria-hidden="true" data-code="f1e8"></i> twitch</li>
+
+      <li data-addable="true"><i class="fa fa-twitter" data-name="twitter" aria-hidden="true" data-code="f099"></i> twitter</li>
+
+      <li data-addable="true"><i class="fa fa-twitter-square" data-name="twitter-square" aria-hidden="true" data-code="f081"></i> twitter-square</li>
+
+      <li data-addable="true"><i class="fa fa-usb" data-name="usb" aria-hidden="true" data-code="f287"></i> usb</li>
+
+      <li data-addable="true"><i class="fa fa-viacoin" data-name="viacoin" aria-hidden="true" data-code="f237"></i> viacoin</li>
+
+      <li data-addable="true"><i class="fa fa-viadeo" data-name="viadeo" aria-hidden="true" data-code="f2a9"></i> viadeo</li>
+
+      <li data-addable="true"><i class="fa fa-viadeo-square" data-name="viadeo-square" aria-hidden="true" data-code="f2aa"></i> viadeo-square</li>
+
+      <li data-addable="true"><i class="fa fa-vimeo" data-name="vimeo" aria-hidden="true" data-code="f27d"></i> vimeo</li>
+
+      <li data-addable="true"><i class="fa fa-vimeo-square" data-name="vimeo-square" aria-hidden="true" data-code="f194"></i> vimeo-square</li>
+
+      <li data-addable="true"><i class="fa fa-vine" data-name="vine" aria-hidden="true" data-code="f1ca"></i> vine</li>
+
+      <li data-addable="true"><i class="fa fa-vk" data-name="vk" aria-hidden="true" data-code="f189"></i> vk</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-weibo" data-name="weibo" aria-hidden="true" data-code="f18a"></i> weibo</li>
+
+      <li data-addable="true"><i class="fa fa-weixin" data-name="weixin" aria-hidden="true" data-code="f1d7"></i> weixin</li>
+
+      <li data-addable="true"><i class="fa fa-whatsapp" data-name="whatsapp" aria-hidden="true" data-code="f232"></i> whatsapp</li>
+
+      <li data-addable="true"><i class="fa fa-wikipedia-w" data-name="wikipedia-w" aria-hidden="true" data-code="f266"></i> wikipedia-w</li>
+
+      <li data-addable="true"><i class="fa fa-windows" data-name="windows" aria-hidden="true" data-code="f17a"></i> windows</li>
+
+      <li data-addable="true"><i class="fa fa-wordpress" data-name="wordpress" aria-hidden="true" data-code="f19a"></i> wordpress</li>
+
+      <li data-addable="true"><i class="fa fa-wpbeginner" data-name="wpbeginner" aria-hidden="true" data-code="f297"></i> wpbeginner</li>
+
+      <li data-addable="true"><i class="fa fa-wpexplorer" data-name="wpexplorer" aria-hidden="true" data-code="f2de"></i> wpexplorer</li>
+
+      <li data-addable="true"><i class="fa fa-wpforms" data-name="wpforms" aria-hidden="true" data-code="f298"></i> wpforms</li>
+
+      <li data-addable="true"><i class="fa fa-xing" data-name="xing" aria-hidden="true" data-code="f168"></i> xing</li>
+
+      <li data-addable="true"><i class="fa fa-xing-square" data-name="xing-square" aria-hidden="true" data-code="f169"></i> xing-square</li>
+
+      <li data-addable="true"><i class="fa fa-y-combinator" data-name="y-combinator" aria-hidden="true" data-code="f23b"></i> y-combinator</li>
+
+
+
+      <li data-addable="true"><i class="fa fa-yahoo" data-name="yahoo" aria-hidden="true" data-code="f19e"></i> yahoo</li>
+
+
+
+
+
+      <li data-addable="true"><i class="fa fa-yelp" data-name="yelp" aria-hidden="true" data-code="f1e9"></i> yelp</li>
+
+      <li data-addable="true"><i class="fa fa-yoast" data-name="yoast" aria-hidden="true" data-code="f2b1"></i> yoast</li>
+
+      <li data-addable="true"><i class="fa fa-youtube" data-name="youtube" aria-hidden="true" data-code="f167"></i> youtube</li>
+
+      <li data-addable="true"><i class="fa fa-youtube-play" data-name="youtube-play" aria-hidden="true" data-code="f16a"></i> youtube-play</li>
+
+      <li data-addable="true"><i class="fa fa-youtube-square" data-name="youtube-square" aria-hidden="true" data-code="f166"></i> youtube-square</li>
+
+  </ul>
+
+</section>
+
+    <section id="medical">
+  <h2 class="page-header">Medical Icons</h2>
+
+  <ul>
+
+
+
+      <li data-addable="true"><i class="fa fa-ambulance" data-name="ambulance" aria-hidden="true" data-code="f0f9"></i> ambulance</li>
+
+      <li data-addable="true"><i class="fa fa-h-square" data-name="h-square" aria-hidden="true" data-code="f0fd"></i> h-square</li>
+
+      <li data-addable="true"><i class="fa fa-heart" data-name="heart" aria-hidden="true" data-code="f004"></i> heart</li>
+
+      <li data-addable="true"><i class="fa fa-heart-o" data-name="heart-o" aria-hidden="true" data-code="f08a"></i> heart-o</li>
+
+      <li data-addable="true"><i class="fa fa-heartbeat" data-name="heartbeat" aria-hidden="true" data-code="f21e"></i> heartbeat</li>
+
+      <li data-addable="true"><i class="fa fa-hospital-o" data-name="hospital-o" aria-hidden="true" data-code="f0f8"></i> hospital-o</li>
+
+      <li data-addable="true"><i class="fa fa-medkit" data-name="medkit" aria-hidden="true" data-code="f0fa"></i> medkit</li>
+
+      <li data-addable="true"><i class="fa fa-plus-square" data-name="plus-square" aria-hidden="true" data-code="f0fe"></i> plus-square</li>
+
+      <li data-addable="true"><i class="fa fa-stethoscope" data-name="stethoscope" aria-hidden="true" data-code="f0f1"></i> stethoscope</li>
+
+      <li data-addable="true"><i class="fa fa-user-md" data-name="user-md" aria-hidden="true" data-code="f0f0"></i> user-md</li>
+
+      <li data-addable="true"><i class="fa fa-wheelchair" data-name="wheelchair" aria-hidden="true" data-code="f193"></i> wheelchair</li>
+
+      <li data-addable="true"><i class="fa fa-wheelchair-alt" data-name="wheelchair-alt" aria-hidden="true" data-code="f29b"></i> wheelchair-alt</li>
+
+  </ul>
+
+</section>
+
+
+  </div>
+  </div>
+  <div class="toolbar-container control-panel">
+  	<div class="toolbar" id="globalToolbar">
+  		<button type="button" id="addText">Text</button>
+  		<button type="button" class="colour" data-value="#05345C">Kent Blue</button>
+  		<button type="button" class="colour" data-value="#263566">Kent Light Blue</button>
+  		<button type="button" class="colour" data-value="#937227">Kent Gold</button>
+  	</div>
+  	<div class="toolbar" id="textToolbar">
+  		<select id="fontFamily">
+  			<option value="helvetica">Helvetica</option>
+  			<option value="CenturySchoolbookStdRegular">Century Schoolbook</option>
+  		</select>
+  		<button type="button" class="colour" data-value="#05345C">Kent Blue</button>
+  		<button type="button" class="colour" data-value="#263566">Kent Light Blue</button>
+  		<button type="button" class="colour" data-value="#937227">Kent Gold</button>
+  		<button type="button" class="colour" data-value="#FFFFFF">White</button>
+  	</div>
+  	<div class="toolbar" id="iconToolbar">
+  		<button type="button" class="colour" data-value="#05345C">Kent Blue</button>
+  		<button type="button" class="colour" data-value="#263566">Kent Light Blue</button>
+  		<button type="button" class="colour" data-value="#937227">Kent Gold</button>
+  		<button type="button" class="colour" data-value="#FFFFFF">White</button>
+  	</div>
+  </div>
+	  <div class="workspace">
+		  <div class="build-area-container">
+		  	<div class="svg-build-area">
+			  	<svg id="build-area"></svg>
+			  	<canvas id="controls" class="underlay"></canvas>
+		  	</div>
+		  	<div id="build-area-resizer" class="resizer"></div>
+		  </div>
+	  </div>
+  	<script type="text/javascript">
+  		var area = document.querySelector("#build-area");
+  		var resizer = document.querySelector("#build-area-resizer");
+  		var controls = document.querySelector("#controls");
+  		var wrapper = area.parentNode;
+  		var computedStyles = window.getComputedStyle(area);
+  		var dims = {width: parseInt(computedStyles.width), height: parseInt(computedStyles.height)};
+  		var controlsCtx = controls.getContext('2d');
+  		var runningVals = {};
+  		var controlHitArea = {};
+  		var targetElm;
+  		var areaRect = area.getBoundingClientRect();
+  		resizer.addEventListener("mousedown", startResize, false);
+  		area.addEventListener("mousedown", areaInteraction, false);
+  		controls.addEventListener("mousedown", controlsInteraction, false);
+  		controls.addEventListener("mouseup", controlsInteractionCleanup, false);
+  		wrapper.addEventListener("mousemove", controlTracking, false);
+  		var scrollPos = [0,0];
+		var ticking = false;
+		window.addEventListener('scroll', function(e) {
+		  scrollPos[0] = window.scrollX;
+		  scrollPos[1] = window.scrollY;
+		  if (!ticking) {
+		    window.requestAnimationFrame(function() {
+		      handleScrolling(scrollPos);
+		      ticking = false;
+		    });
+		  }
+		  ticking = true;
+		});
+  		var movableTags = ["use", "text"];
+  		var spritePicker = document.querySelector("#collectionPicker");
+  		spritePicker.addEventListener("change", spriteBoxPick, false);
+  		var spriteBoxes = document.querySelectorAll(".sprite-box");
+  		for (var i = 0; i < spriteBoxes.length; i++) {
+  			var spriteData = {};
+  			spriteData.iconType = spriteBoxes[i].getAttribute("data-type");
+  			if (spriteData.iconType == "font") {
+  				spriteData.fontName = spriteBoxes[i].getAttribute("data-font");
+  			}
+  			spriteBoxes[i].addEventListener("click", spriteBoxInteraction.bind(spriteBoxes[i], spriteData), false);
+  			var opt = document.createElement("option");
+  			opt.value = spriteBoxes[i].id;
+  			opt.textContent = spriteBoxes[i].getAttribute("data-name");
+  			spritePicker.insertAdjacentElement('beforeend', opt);
+  			if (i != 0) {
+  				spriteBoxes[i].style.display = "none";
+  			}
+  		}
+  		var addText = document.querySelector("#addText");
+  		addText.addEventListener("click", function() {
+  			var text = prompt("Enter your text");
+  			var html = '<text class="editable" data-type="text" font-family="Helvetica" x="0" y="15">'+text+'</text>';
+			if (area.length > 0) {
+				area.children[area.length-1].insertAdjacentHTML('afterend', html);
+			} else {
+				area.insertAdjacentHTML('beforeend', html);
+			}
+  		}, false);
+  		var globalColours = document.querySelectorAll("#globalToolbar .colour");
+  		for (var i = 0; i < globalColours.length; i++) {
+  			globalColours[i].addEventListener("click", function(evt) {
+  				wrapper.style.background = evt.target.getAttribute('data-value');
+  			}, false);
+  		}
+  		var globalColours = document.querySelectorAll("#textToolbar .colour, #iconToolbar .colour");
+  		for (var i = 0; i < globalColours.length; i++) {
+  			globalColours[i].addEventListener("click", function(evt) {
+  				targetElm.setAttribute("fill", evt.target.getAttribute('data-value'));
+  			}, false);
+  		}
+  		document.querySelector("#fontFamily").addEventListener("change", function(evt) {
+  			targetElm.setAttribute("font-family", evt.target.selectedOptions[0].value);
+  		}, false)
+  		switchToolbar();
+  		init();
+
+  		function init() {
+  			area.setAttribute("width", screen.width);
+  			area.setAttribute("height", screen.height);
+  			area.setAttribute("viewBox", "0 0 "+screen.width+" "+screen.height);
+  			dims.width = 400;
+  			dims.height = 250;
+  			wrapper.style.width = dims.width+"px";
+  			wrapper.style.height = dims.height+"px";
+  			wrapper.style.background = "url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAMAAADzN3VRAAAAJFBMVEWampr///+JiYmamprNzc3///91dXWJiYmamprExMTNzc3///+Mg3uSAAAABnRSTlPm5vLy8vLmOaTsAAAARElEQVR42t3JuQHAIAwEwUMPwqL/fu3ohAI3wGy4gJKYl4FVIvcB+nP8uiNBsx9Ler7I4LvkDJJ+YpFed3Y/BcOLiRJevtYVD3u54O4AAAAASUVORK5CYII=)";
+  			controls.width = dims.width;
+  			controls.height = dims.height;
+  		}
+
+  		function switchToolbar(toolbarName) {
+  			if (typeof toolbarName == "undefined") {
+  				toolbarName = "global";
+  			}
+  			var toolbars = document.querySelectorAll(".toolbar");
+	  		for (var i = 0; i < toolbars.length; i++) {
+	  			if (toolbars[i].id != toolbarName+"Toolbar") {
+	  				toolbars[i].style.display = "none";
+	  			} else {
+	  				toolbars[i].style.display = "initial";
+	  			}
+	  		}
+  		}
+
+  		function startResize(evt) {
+  			if (evt.target.id = "build-area-resizer" && "clientX" in evt && "clientY" in evt) {
+	  			runningVals.x = evt.clientX;
+	  			runningVals.y = evt.clientY;
+	  			window.addEventListener("mousemove", doResize, false);
+	  			window.addEventListener("mouseup", endResize, false);
+	  			console.log(runningVals, dims);
+	  		}
+  		}
+
+  		function doResize(evt) {
+  			var diffX = evt.clientX - runningVals.x;
+  			var diffY = evt.clientY - runningVals.y;
+  			dims.width += (dims.width + parseInt(diffX) < 1) ? 0 : parseInt(diffX)*2;
+  			dims.height += (dims.height + parseInt(diffY) < 1) ? 0 : parseInt(diffY)*2;
+  			wrapper.style.width = dims.width+"px";
+  			wrapper.style.height = dims.height+"px";
+  			controls.width = dims.width;
+  			controls.height = dims.height;
+  			runningVals.x = evt.clientX;
+  			runningVals.y = evt.clientY;
+  			console.log({diffX: diffX, diffY: diffY, dimWidth: dims.width, dimHeight: dims.height, runningVals});
+  		}
+
+  		function endResize(evt) {
+  			window.removeEventListener("mousemove", doResize, false);
+  			window.removeEventListener("mouseup", endResize, false);
+  			if ("clientX" in evt && "clientY" in evt) {
+  				doResize(evt);
+  			}
+  			runningVals = {};
+  		}
+
+  		function areaInteraction(evt) {
+  			var controlAvailable = false;
+  			if ("clientX" in evt && "clientY" in evt) {
+	  			for (var action in controlHitArea) {
+	  				var bounds = controlHitArea[action].bounds;
+	  				console.log(evt.clientX, bounds.left, evt.clientX, bounds.right);
+	  				console.log(evt.clientY, bounds.top, evt.clientY, bounds.bottom);
+	  				if ((evt.clientX > bounds.left && evt.clientX < bounds.right) && (evt.clientY > bounds.top && evt.clientY < bounds.bottom)) {
+	  					controlAvailable = {action: action, elm: controlHitArea[action].svgElm};
+	  				}
+	  			}
+	  		}
+
+	  		if (evt.target.className == "resizer") {
+  				return true;
+  			} else if (controlAvailable != false) {
+  				controls.className = "overlay";
+	  			window[controlAvailable.action](evt, controlAvailable.elm);
+	  			return true;
+  			} else if (movableTags.indexOf(evt.target.tagName) != -1) {
+  				startMove(evt);
+  			}
+  			switchToolbar();
+	  		clearControls();
+  		}
+
+  		function clearControls() {
+  			controlsCtx.clearRect(0,0,dims.width, dims.height);
+  			controlHitArea = {};
+  		}
+
+  		function controlsInteraction(evt) {
+  			if ("clientX" in evt && "clientY" in evt) {
+	  			for (var action in controlHitArea) {
+	  				console.log(action);
+	  				var bounds = controlHitArea[action].bounds;
+	  				if ((evt.clientX > bounds.left && evt.clientX < bounds.right) && (evt.clientY > bounds.top && evt.clientY < bounds.bottom)) {
+	  					window[action](evt, controlHitArea[action].svgElm);
+	  					return true;
+	  				}
+	  			}
+	  		}
+	  		controls.className = "underlay";
+	  		areaInteraction(evt);
+	  		return false;
+  		}
+
+  		function controlsInteractionCleanup(evt) {
+  			controls.className = "underlay";
+  		}
+
+  		function controlTracking(evt) {
+  			if ("clientX" in evt && "clientY" in evt) {
+	  			for (var action in controlHitArea) {
+	  				var bounds = controlHitArea[action].bounds;
+	  				if ("actionCursor" in controlHitArea[action] && (evt.clientX > bounds.left && evt.clientX < bounds.right) && (evt.clientY > bounds.top && evt.clientY < bounds.bottom)) {
+	  					wrapper.style.cursor = controlHitArea[action].actionCursor;
+	  					return true;
+	  				}
+	  			}
+	  		}
+	  		if (wrapper.style.cursor.length > 0) {
+	  			wrapper.style.cursor = "";
+	  		}
+  		}
+
+  		function spriteBoxInteraction(spriteData, evt) {
+  			var target;
+  			console.log(evt.target, evt.target.tagName);
+  			switch(evt.target.tagName) {
+  				case "LI":
+  					if (evt.target.getAttribute("data-addable") == "true") {
+  						target = evt.target.querySelector("i");
+  					}
+  					break;
+  				case "I":
+  					if (evt.target.parentNode.getAttribute("data-addable") == "true") {
+  						target = evt.target;
+  					}
+  					break;
+  				case "svg":
+  					if (evt.target.parentNode.getAttribute("data-addable") == "true") {
+  						target = evt.target.querySelector("use");
+  					}
+  					break;
+  				case "use":
+  					if (evt.target.parentNode.parentNode.getAttribute("data-addable") == "true") {
+  						target = evt.target;
+  					}
+  					break;
+  			}
+  			if (typeof target != "undefined") {
+  				var html = "";
+  				switch(spriteData.iconType) {
+  					case "font":
+  						html = '<text data-type="icon" font-family="'+spriteData.fontName+'" x="0" y="15">&#x'+target.getAttribute("data-code")+';</text>';
+  						break;
+  					case "inline-svg":
+  						html = '<use data-type="graphic" xlink:href="'+target.getAttribute("xlink:href")+'" />';
+  				}
+  				if (area.length > 0) {
+	  				area.children[area.length-1].insertAdjacentHTML('afterend', html);
+	  			} else {
+	  				area.insertAdjacentHTML('beforeend', html);
+	  			}
+  			}
+  		}
+
+  		function spriteBoxPick(evt) {
+  			var spriteBoxes = document.querySelectorAll(".sprite-box");
+  			for (var i = 0; i < spriteBoxes.length; i++) {
+  				spriteBoxes[i].style.display = i == evt.target.selectedIndex ? "block" : "none";
+  			}
+  		}
+
+  		function startMove(evt) {
+  			if (movableTags.indexOf(evt.target.tagName) != -1 && "clientX" in evt && "clientY" in evt) {
+  				runningVals.clientx = evt.clientX;
+	  			runningVals.clienty = evt.clientY;
+	  			runningVals.elm = evt.target;
+	  			var found = false;
+  				for (var i = runningVals.elm.transform.baseVal.length - 1; i >= 0; i--) {
+  					var transform = runningVals.elm.transform.baseVal[i];
+  					if (transform.type == 2) {
+  						runningVals.x = transform.matrix.translate(0,0).e;
+  						runningVals.y = transform.matrix.translate(0,0).f;
+  						runningVals.transform = transform;
+  						console.log(transform);
+  						found = true;
+  						continue;
+  					}
+  				}
+	  			if (!found) {
+		  			runningVals.x = 0;
+		  			runningVals.y = 0;
+		  			var translate = area.createSVGTransform();
+		  			translate.setTranslate(0,0);
+		  			runningVals.elm.transform.baseVal.appendItem(translate);
+		  			runningVals.transform = translate;
+		  		}
+	  			runningVals.clickStartTime = new Date().getTime();
+	  			wrapper.addEventListener("mousemove", doMove, false);
+	  			window.addEventListener("mouseup", endMove, false);
+	  			console.log(runningVals, runningVals.x, runningVals.y);
+  			}
+  		}
+
+  		function doMove(evt) {
+  			var diffX = evt.clientX - runningVals.clientx;
+  			var diffY = evt.clientY - runningVals.clienty;
+  			if (diffX != 0 || diffY != 0) {
+  				runningVals.clickStartTime = 0;
+  			}
+  			runningVals.x += parseInt(diffX);
+  			runningVals.y += parseInt(diffY);
+  			runningVals.transform.setTranslate(runningVals.x, runningVals.y);
+  			runningVals.clientx = evt.clientX;
+  			runningVals.clienty = evt.clientY;
+  			console.log({diffX: diffX, diffY: diffY, runningVals});
+  		}
+
+  		function endMove(evt) {
+  			wrapper.removeEventListener("mousemove", doMove, false);
+  			window.removeEventListener("mouseup", endMove, false);
+  			areaRect = area.getBoundingClientRect();
+  			if (new Date().getTime() - runningVals.clickStartTime < 500) {
+  				showScale(runningVals.elm);
+  				showControls(runningVals.elm);
+  			}
+  			runningVals = {};
+  		}
+
+  		function showControls(elm) {
+  			if (elm.className.baseVal.indexOf("editable") > -1) {
+	  			var edges = elm.getBoundingClientRect();
+	  			controlsCtx.font = '12px serif';
+	  			controlsCtx.fillText('Aa', edges.right-areaRect.left+10, edges.top-areaRect.top-10);
+	  			controlHitArea.changeText = {bounds: {left: edges.right+10, top: edges.top-22, right: edges.right+30, bottom: edges.top-2}, svgElm: elm, actionCursor: "text"};
+	  		}
+	  		targetElm = elm;
+	  		switchToolbar(elm.getAttribute("data-type"));
+  		}
+
+  		function changeText(evt, elm) {
+  			elm.textContent = prompt("Change text to what?");
+  			clearControls();
+  			showScale(elm);
+  			showControls(elm);
+  		}
+
+  		function showScale(elm) {
+  			var edges = elm.getBoundingClientRect();
+  			console.log(edges);
+  			controlsCtx.beginPath();
+  			controlsCtx.strokeStyle = 'black';
+  			controlsCtx.moveTo(edges.left-areaRect.left-5, edges.top-areaRect.top-5);
+			controlsCtx.lineTo(edges.left-areaRect.left-5, edges.bottom-areaRect.top+5);
+			controlsCtx.lineTo(edges.right-areaRect.left+5, edges.bottom-areaRect.top+5);
+			controlsCtx.lineTo(edges.right-areaRect.left+5, edges.top-areaRect.top-5);
+			controlsCtx.lineTo(edges.left-areaRect.left-5, edges.top-areaRect.top-5);
+			controlsCtx.stroke();
+			controlsCtx.fillStyle = 'black';
+			controlsCtx.fillRect(edges.right-areaRect.left, edges.bottom-areaRect.top, 10, 10);
+			controlHitArea.startRescale = {bounds: {left: edges.right, top: edges.bottom, right: edges.right+10, bottom: edges.bottom+10}, svgElm: elm, actionCursor: "nw-resize"};
+  		}
+
+  		function startRescale(evt, elm) {
+  			if ("clientX" in evt && "clientY" in evt) {
+  				runningVals.clientx = evt.clientX;
+	  			runningVals.clienty = evt.clientY;
+	  			runningVals.elm = elm;
+	  			var clientRect = elm.getBoundingClientRect();
+	  			var found = false;
+  				for (var i = elm.transform.baseVal.length - 1; i >= 0; i--) {
+  					var transform = elm.transform.baseVal[i];
+  					if (transform.type == 3) {
+  						runningVals.scale = transform.matrix.scale(1).a;
+  						runningVals.transform = transform;
+  						found = true;
+  						continue;
+  					}
+  				}
+	  			if (!found) {
+		  			runningVals.scale = 1;
+		  			var scale = area.createSVGTransform();
+		  			scale.setScale(1,1);
+		  			elm.transform.baseVal.appendItem(scale);
+		  			runningVals.transform = scale;
+		  		}
+		  		runningVals.origWidth = runningVals.scale == 1 ? clientRect.width : clientRect.width/runningVals.scale;
+		  		runningVals.currentWidth = runningVals.scale == 1 ? runningVals.origWidth*runningVals.scale : clientRect.width;
+	  			controls.addEventListener("mousemove", doRescale, false);
+	  			window.addEventListener("mouseup", endRescale, false);
+	  			console.log(runningVals, runningVals.scale);
+  			}
+  		}
+
+  		function doRescale(evt) {
+  			var diffX = evt.clientX - runningVals.clientx;
+  			var diffY = evt.clientY - runningVals.clienty;
+  			var diff = (diffX + diffY)/2;
+  			runningVals.currentWidth += diff;
+  			runningVals.scale = runningVals.currentWidth/runningVals.origWidth;
+  			runningVals.transform.setScale(runningVals.scale, runningVals.scale);
+  			clearControls();
+  			showScale(runningVals.elm);
+  			runningVals.clientx = evt.clientX;
+  			runningVals.clienty = evt.clientY;
+  			console.log({diffX: diffX, diffY: diffY, runningVals});
+  		}
+
+  		function endRescale(evt) {
+  			controls.removeEventListener("mousemove", doRescale, false);
+  			window.removeEventListener("mouseup", endRescale, false);
+  			runningVals = {};
+  		}
+
+  		function handleScrolling(scrollPos) {
+  			areaRect = area.getBoundingClientRect();
+  			for (var action in controlHitArea) {
+  				var hitArea = controlHitArea[action];
+  				var edges = hitArea.svgElm.getBoundingClientRect();
+  				controlHitArea[action].bounds = {left: edges.right, top: edges.bottom, right: edges.right+10, bottom: edges.bottom+10};
+  			}
+  		}
+  	</script>
+  </body>
+</html>
